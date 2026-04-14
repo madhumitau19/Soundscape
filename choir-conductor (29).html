@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sound Collage Conductor</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header>
+  <h1>Sound <em>Collage</em></h1>
+  <p class="subtitle">Conduct · Record · Layer &nbsp;·&nbsp; Every sound on Freesound</p>
+</header>
+<div class="rule"></div>
+
+<main>
+  <div class="legend">
+    <div class="legend-item"><div class="legend-dot" style="background:var(--left)"></div>Left hand</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--right)"></div>Right hand</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--rec)"></div>Recording</div>
+  </div>
+
+  <div id="setup">
+
+    <button id="start-btn">Begin</button>
+  </div>
+
+  <div id="status"></div>
+  <div id="debug-box"></div>
+
+  <div id="canvas-wrap">
+    <video id="video" autoplay playsinline muted></video>
+    <canvas id="overlay"></canvas>
+    <div id="rec-indicator">
+      <div class="rec-dot"></div>
+      <span id="rec-timer">0:00</span>
+    </div>
+    <!-- Sound menus overlaid on the video -->
+    <div class="sound-menu left" id="menu-left">
+      <div class="menu-inner" id="menu-inner-left"></div>
+      <span class="menu-hint">✊ scroll · ☝ reverse · 👍 select</span>
+      <span class="gesture-badge" id="badge-left"></span>
+    </div>
+    <div class="sound-menu right" id="menu-right">
+      <div class="menu-inner" id="menu-inner-right"></div>
+      <span class="menu-hint">✊ scroll · ☝ reverse · 👍 select</span>
+      <span class="gesture-badge" id="badge-right"></span>
+    </div>
+  </div>
+
+  <div id="pitch-strip">
+    <span class="pitch-label">low</span>
+    <div class="pitch-bar-wrap">
+      <div class="pitch-marker-l" id="pm-left"  style="left:50%"></div>
+      <div class="pitch-marker-r" id="pm-right" style="left:50%"></div>
+    </div>
+    <span class="pitch-label">high</span>
+  </div>
+
+  <div id="info">
+    <div class="hand-card left-hand">
+      <div class="swipe-flash" id="flash-left"></div>
+      <div class="hand-label">Left hand</div>
+      <div class="spinner" id="spin-left"></div>
+      <div class="sound-name" id="left-name">— waiting —</div>
+      <div class="sound-tags" id="left-tags"></div>
+      <div class="playhead-wrap"><div class="playhead" id="left-playhead"></div></div>
+      <div class="hand-meta">
+        <span id="left-pitch-label">pitch: —</span>
+        <span id="left-vol-label">vol: —</span>
+      </div>
+      <div class="vol-bar-wrap"><div class="vol-bar" id="left-bar"></div></div>
+    </div>
+    <div class="hand-card right-hand">
+      <div class="swipe-flash" id="flash-right"></div>
+      <div class="hand-label">Right hand</div>
+      <div class="spinner" id="spin-right"></div>
+      <div class="sound-name" id="right-name">— waiting —</div>
+      <div class="sound-tags" id="right-tags"></div>
+      <div class="playhead-wrap"><div class="playhead" id="right-playhead"></div></div>
+      <div class="hand-meta">
+        <span id="right-pitch-label">pitch: —</span>
+        <span id="right-vol-label">vol: —</span>
+      </div>
+      <div class="vol-bar-wrap"><div class="vol-bar" id="right-bar"></div></div>
+    </div>
+  </div>
+
+  <!-- Recording controls -->
+  <div id="rec-panel">
+    <div class="rec-controls">
+      <button class="btn-rec" id="btn-record">&#9679; Record</button>
+      <button class="btn-rec" id="btn-stop" disabled>&#9632; Stop</button>
+      <span id="status-rec" style="font-size:11px;color:var(--muted);letter-spacing:0.08em;flex:1"></span>
+    </div>
+
+    <div id="layers-wrap" style="display:none">
+      <div id="layers-label">Layers</div>
+      <div id="layers-list"></div>
+      <div id="export-row" style="margin-top:4px">
+        <button class="btn-export" id="btn-mix" disabled>Bounce &amp; Download Mix</button>
+        <span style="font-size:10px;color:var(--muted);letter-spacing:0.08em" id="mix-status"></span>
+        <a id="mix-dl-link" style="display:none;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--left);text-decoration:none;border:1px solid rgba(155,143,232,0.4);padding:6px 14px;" download="collage-mix.wav">⬇ Save WAV</a>
+      </div>
+    </div>
+  </div>
+
+  <div id="hint">
+    Up / Down &nbsp;→&nbsp; pitch &nbsp;·&nbsp; Spread / close &nbsp;→&nbsp; volume<br>
+    ✊ Fist &nbsp;→&nbsp; scroll menu down &nbsp;·&nbsp; ☝ One finger &nbsp;→&nbsp; scroll up &nbsp;·&nbsp; 👍 Thumbs up &nbsp;→&nbsp; select &amp; play
+  </div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+<script src="script.js"></script>
+</body>
+</html>

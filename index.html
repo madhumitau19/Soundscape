@@ -48,51 +48,56 @@
     </div>
   </div>
 
-  <div id="pitch-strip">
-    <span class="pitch-label">low</span>
-    <div class="pitch-bar-wrap">
-      <div class="pitch-marker-l" id="pm-left"  style="left:50%"></div>
-      <div class="pitch-marker-r" id="pm-right" style="left:50%"></div>
-    </div>
-    <span class="pitch-label">high</span>
-  </div>
+  
 
   <div id="info">
-    <div class="hand-card left-hand">
-      <div class="swipe-flash" id="flash-left"></div>
-      <div class="hand-label">Left hand</div>
-      <div class="spinner" id="spin-left"></div>
-      <div class="sound-name" id="left-name">— waiting —</div>
-      <div class="sound-tags" id="left-tags"></div>
-      <div class="playhead-wrap"><div class="playhead" id="left-playhead"></div></div>
-      <div class="hand-meta">
-        <span id="left-pitch-label">pitch: —</span>
-        <span id="left-vol-label">vol: —</span>
+    <div id="pitch-strip">
+      <span class="pitch-label">low</span>
+      <div class="pitch-bar-wrap">
+        <div class="pitch-marker-l" id="pm-left"  style="left:50%"></div>
+        <div class="pitch-marker-r" id="pm-right" style="left:50%"></div>
       </div>
-      <div class="vol-bar-wrap"><div class="vol-bar" id="left-bar"></div></div>
+      <span class="pitch-label">high</span>
     </div>
-    <div class="hand-card right-hand">
-      <div class="swipe-flash" id="flash-right"></div>
-      <div class="hand-label">Right hand</div>
-      <div class="spinner" id="spin-right"></div>
-      <div class="sound-name" id="right-name">— waiting —</div>
-      <div class="sound-tags" id="right-tags"></div>
-      <div class="playhead-wrap"><div class="playhead" id="right-playhead"></div></div>
-      <div class="hand-meta">
-        <span id="right-pitch-label">pitch: —</span>
-        <span id="right-vol-label">vol: —</span>
+    <div id="hand-cards">
+      <div class="hand-card left-hand">
+        <div class="swipe-flash" id="flash-left"></div>
+        <div class="hand-label">Left hand</div>
+        <div class="spinner" id="spin-left"></div>
+        <div class="sound-name" id="left-name">— waiting —</div>
+        <div class="sound-tags" id="left-tags"></div>
+        <div class="playhead-wrap"><div class="playhead" id="left-playhead"></div></div>
+        <div class="hand-meta">
+          <span id="left-pitch-label">pitch: —</span>
+          <span id="left-vol-label">vol: —</span>
+        </div>
+        <div class="vol-bar-wrap"><div class="vol-bar" id="left-bar"></div></div>
       </div>
-      <div class="vol-bar-wrap"><div class="vol-bar" id="right-bar"></div></div>
+      <div class="hand-card right-hand">
+        <div class="swipe-flash" id="flash-right"></div>
+        <div class="hand-label">Right hand</div>
+        <div class="spinner" id="spin-right"></div>
+        <div class="sound-name" id="right-name">— waiting —</div>
+        <div class="sound-tags" id="right-tags"></div>
+        <div class="playhead-wrap"><div class="playhead" id="right-playhead"></div></div>
+        <div class="hand-meta">
+          <span id="right-pitch-label">pitch: —</span>
+          <span id="right-vol-label">vol: —</span>
+        </div>
+        <div class="vol-bar-wrap"><div class="vol-bar" id="right-bar"></div></div>
+      </div>
     </div>
-  </div>
 
-  <!-- Recording controls -->
-  <div id="rec-panel">
+    <div id="rec-panel">
     <div class="rec-controls">
       <button class="btn-rec" id="btn-record">&#9679; Record</button>
       <button class="btn-rec" id="btn-stop" disabled>&#9632; Stop</button>
       <span id="status-rec" style="font-size:11px;color:var(--muted);letter-spacing:0.08em;flex:1"></span>
     </div>
+  </div>
+
+  <!-- Recording controls -->
+  
 
     <div id="layers-wrap" style="display:none">
       <div id="layers-label">Layers</div>

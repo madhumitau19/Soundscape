@@ -109,7 +109,20 @@
   #rec-timer { font-size:11px; letter-spacing:0.1em; color:var(--rec); font-variant-numeric:tabular-nums; }
 
   /* Hand cards */
-  #info { display:none; width:100%; gap:12px; }
+  #info { 
+    display:none; 
+    width:50%;
+    position: fixed;
+    left: 25%;
+    bottom: 25vh; 
+    gap:12px; 
+    }
+
+#hand-cards{
+   display: flex;
+   gap: 10px; 
+}
+
   .hand-card { flex:1; padding:14px 16px; background:rgba(22,20,31,0.7); border:1px solid var(--bord); position:relative; overflow:hidden; backdrop-filter:blur(4px); }
   .hand-card.left-hand  { border-left:2px solid var(--left); }
   .hand-card.right-hand { border-left:2px solid var(--right); }
@@ -137,7 +150,13 @@
   .swipe-flash.show { opacity:1; }
 
   /* ── Recording panel ── */
-  #rec-panel { display:none; width:100%; flex-direction:column; gap:10px; }
+  #rec-panel { 
+    display:none; 
+    width:100%; 
+    flex-direction:column; 
+    gap:10px;
+    margin-top: 20px; 
+}
 
   .rec-controls { display:flex; gap:10px; align-items:center; width:100%; }
 
@@ -157,7 +176,7 @@
   #btn-stop:hover:not(:disabled) { background:rgba(255,255,255,0.06); }
 
   /* Layers list */
-  #layers-wrap { width:100%; display:flex; flex-direction:column; gap:8px; }
+  #layers-wrap { width:100%; display:flex; flex-direction:column; gap:8px; margin-top: 20px;}
   #layers-label { font-size:10px; letter-spacing:0.18em; text-transform:uppercase; color:var(--muted); }
 
   #layers-list { display:flex; flex-direction:column; gap:6px; width:100%; }
@@ -211,7 +230,12 @@
   .legend-item { display:flex; align-items:center; gap:6px; }
   .legend-dot { width:6px; height:6px; border-radius:50%; }
 
-  #pitch-strip { display:none; width:100%; align-items:center; justify-content:space-between; padding:0 4px; }
+  #pitch-strip { 
+    display:none; 
+    width:100%; 
+    align-items:center; justify-content:space-between; 
+    padding: 20px 4px; 
+    }
   .pitch-label { font-size:10px; letter-spacing:0.1em; color:var(--muted); }
   .pitch-bar-wrap { flex:1; height:2px; background:rgba(255,255,255,0.06); margin:0 10px; position:relative; }
   .pitch-marker-l,.pitch-marker-r { position:absolute; top:-3px; width:8px; height:8px; border-radius:50%; transform:translateX(-50%); transition:left 0.08s; }
@@ -227,7 +251,7 @@
 
   /* ── Sound menus ── */
   .sound-menu {
-    position:absolute; top:0; bottom:0; width:38%; z-index:5;
+    position:absolute; top:0; bottom:0; width:25%; z-index:5;
     display:flex; flex-direction:column; justify-content:center;
     pointer-events:none; overflow:hidden;
   }

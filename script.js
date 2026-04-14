@@ -867,7 +867,7 @@ document.getElementById('start-btn').addEventListener('click', async () => {
     new Camera(video,{onFrame:async()=>{await mp.send({image:video});},width:640,height:480}).start();
 
     document.getElementById('canvas-wrap').style.display='block';
-    document.getElementById('info').style.display='flex';
+    document.getElementById('info').style.display='block';
     document.getElementById('rec-panel').style.display='flex';
     document.getElementById('hint').style.display='block';
     document.getElementById('pitch-strip').style.display='flex';

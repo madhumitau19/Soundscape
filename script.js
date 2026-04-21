@@ -803,6 +803,8 @@ document.getElementById('start-btn').addEventListener('click', async () => {
   document.getElementById('menu-left-title').style.display='block';
   //document.getElementById('menu-title-back').style.display='block';
   document.getElementById('header').style.display='none';
+  document.getElementById('instruction').classList.add('show');
+  document.getElementById('instruction-button').classList.add('show');
 
   await Tone.start();
   buildChain('left');
@@ -900,6 +902,7 @@ document.getElementById('start-btn').addEventListener('click', async () => {
     document.getElementById('pitch-strip').style.display='flex';
     document.getElementById('menu-left').classList.add('active');
     document.getElementById('menu-right').classList.add('active');
+    
   } catch(e) {
     setStatus('Camera access denied — please allow permissions and reload.');
     started=false;
@@ -958,6 +961,13 @@ function updateMenuLabels() {
 
 updateMenuLabels();
 window.addEventListener('resize', updateMenuLabels);
+
+let instruction= document.getElementById('instruction');
+let instructionBtn= document.getElementById('instruction-button');
+
+instructionBtn.addEventListener('click', ()=>{
+    instruction.classList.toggle("show");
+});
 
 // function resizeLayerIcons() {
 //   if (window.innerWidth <= 600) {

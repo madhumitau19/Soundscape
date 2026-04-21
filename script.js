@@ -70,21 +70,48 @@ function buildMenus() {
       inner.appendChild(el);
     });
     menus[side].cursor = 0;
+    menus[side].pendingIdx = -1;
     renderMenu(side);
   });
 }
 
 function renderMenu(side) {
-  const inner  = document.getElementById(`menu-inner-${side}`);
-  const items  = inner.querySelectorAll('.menu-item');
-  const cursor = menus[side].cursor;
-  const offset = -(cursor * ITEM_H) + (Math.floor(VISIBLE/2) * ITEM_H);
-  inner.style.transform = `translateY(${offset}px)`;
-  items.forEach((el, i) => {
-    el.classList.toggle('cursor',   i === cursor);
-    el.classList.toggle('selected', soundPool[i] && hands[side].sound?.id === soundPool[i].id);
-  });
+  try {
+    const inner  = document.getElementById(`menu-inner-${side}`);
+    const items  = inner.querySelectorAll('.menu-item');
+    const cursor = menus[side].cursor;
+    const offset = -(cursor * ITEM_H) + (Math.floor(VISIBLE/2) * ITEM_H);
+    inner.style.transform = `translateY(${offset}px)`;
+    items.forEach((el, i) => {
+      el.classList.toggle('cursor',   i === cursor);
+      el.classList.toggle('selected', menus[side].pendingIdx === i);
+    });
+  } catch(e) {
+    console.error('renderMenu error:', e);
+  }
 }
+
+
+['left', 'right'].forEach(side => {
+  const inner = document.getElementById(`menu-inner-${side}`);
+
+  // Click to select
+  inner.addEventListener('click', e => {
+    const item = e.target.closest('.menu-item');
+    if (!item) return;
+    const idx = parseInt(item.dataset.idx, 10);
+    menus[side].cursor = idx;
+    menus[side].pendingIdx = idx;
+    renderMenu(side);
+    menuSelect(side);
+  });
+
+  // Scroll wheel to move cursor
+  document.getElementById(`menu-${side}`).addEventListener('wheel', e => {
+    e.preventDefault();
+    menuScroll(side, e.deltaY > 0 ? 1 : -1);
+  }, { passive: false });
+});
 
 function menuScroll(side, delta) {
   // delta: -1 = up (prev), +1 = down (next)
@@ -102,7 +129,7 @@ function menuSelect(side) {
 function setStatus(t) { document.getElementById('status').textContent = t; }
 function dbg(t) {
   const el = document.getElementById('debug-box');
-  el.style.display = 'block';
+  el.style.display = 'none';
   el.textContent += new Date().toLocaleTimeString() + '  ' + t + '\n';
   el.scrollTop = el.scrollHeight;
 }
@@ -234,7 +261,6 @@ function startRecording() {
   mediaRecorder.start(100);
 
   // UI
-  document.getElementById('rec-indicator').classList.add('show');
   document.getElementById('btn-record').disabled = true;
   document.getElementById('btn-record').classList.add('recording');
   document.getElementById('btn-stop').disabled   = false;
@@ -252,7 +278,6 @@ function stopRecording() {
   mediaRecorder.stop();
   isRecording = false;
   clearInterval(recTimerInterval);
-  document.getElementById('rec-indicator').classList.remove('show');
   document.getElementById('btn-record').disabled = false;
   document.getElementById('btn-record').classList.remove('recording');
   document.getElementById('btn-stop').disabled   = true;
@@ -386,6 +411,26 @@ function renderLayerRow(layer, blob) {
   });
   row.appendChild(muteBtn);
 
+  function updateMuteLabel() {
+    if (window.innerWidth <= 600) {
+        muteBtn.textContent = layer.muted ? 'UM' : 'M';
+    } else {
+        muteBtn.textContent = layer.muted ? 'unmute' : 'mute';
+    }
+    }
+
+    updateMuteLabel(); // set initial label
+
+    // Update the existing click handler to use updateMuteLabel:
+    muteBtn.addEventListener('click', () => {
+    layer.muted = !layer.muted;
+    muteBtn.classList.toggle('muted', layer.muted);
+    updateMuteLabel();
+    layer.volNode.volume.rampTo(layer.muted ? -Infinity : 20*Math.log10(Math.max(0.001,layer.gain)), 0.05);
+    });
+
+    window.addEventListener('resize', updateMuteLabel);
+
   // Solo button
   const soloBtn = document.createElement('button');
   soloBtn.className = 'layer-btn';
@@ -421,7 +466,7 @@ function renderLayerRow(layer, blob) {
   // Download individual layer
   const dlBtn = document.createElement('button');
   dlBtn.className = 'layer-btn';
-  dlBtn.textContent = 'save';
+  dlBtn.textContent = '↓';
   dlBtn.addEventListener('click', () => {
     const a = document.createElement('a');
     a.href = layer.url;
@@ -464,7 +509,7 @@ async function drawWaveform(canvas, blob) {
       }
       const yLow  = ((1 - max) / 2) * H;
       const yHigh = ((1 - min) / 2) * H;
-      ctx2.fillStyle = 'rgba(155,143,232,0.55)';
+      ctx2.fillStyle = '#e9006d';
       ctx2.fillRect(x, yLow, 1, Math.max(1, yHigh - yLow));
     }
   } catch(e) {
@@ -588,83 +633,83 @@ function extendedFingers(lms) {
 
 // ── Fist detection ───────────────────────────────────────────────
 // Returns true when all 4 fingers are curled (fist / closed hand)
-function isFist(lms) {
-  // All 4 fingertips must be BELOW their PIP joint (curled in)
-  const pairs = [[8,6],[12,10],[16,14],[20,18]];
-  for (const [tip, pip] of pairs) {
-    if (lms[tip].y < lms[pip].y - 0.01) return false; // finger is extended
-  }
-  return true;
-}
+// function isFist(lms) {
+//   // All 4 fingertips must be BELOW their PIP joint (curled in)
+//   const pairs = [[8,6],[12,10],[16,14],[20,18]];
+//   for (const [tip, pip] of pairs) {
+//     if (lms[tip].y < lms[pip].y - 0.01) return false; // finger is extended
+//   }
+//   return true;
+// }
 
 // ── One finger up (index only extended) ──────────────────────────
-function isOneFingerUp(lms) {
-  // Index tip clearly above its PIP
-  const indexUp = lms[8].y < lms[6].y - 0.04;
-  // Middle, ring, pinky must be curled
-  const midDown  = lms[12].y >= lms[10].y - 0.01;
-  const ringDown = lms[16].y >= lms[14].y - 0.01;
-  const pinDown  = lms[20].y >= lms[18].y - 0.01;
-  return indexUp && midDown && ringDown && pinDown;
-}
+// function isOneFingerUp(lms) {
+//   // Index tip clearly above its PIP
+//   const indexUp = lms[8].y < lms[6].y - 0.04;
+//   // Middle, ring, pinky must be curled
+//   const midDown  = lms[12].y >= lms[10].y - 0.01;
+//   const ringDown = lms[16].y >= lms[14].y - 0.01;
+//   const pinDown  = lms[20].y >= lms[18].y - 0.01;
+//   return indexUp && midDown && ringDown && pinDown;
+// }
 
 // ── Thumbs up (thumb pointing up, all 4 fingers curled) ──────────
-function isThumbsUp(lms) {
-  // All 4 fingers must be curled
-  const pairs = [[8,6],[12,10],[16,14],[20,18]];
-  for (const [tip, pip] of pairs) {
-    if (lms[tip].y < lms[pip].y - 0.02) return false; // finger extended
-  }
-  // Thumb tip must be clearly ABOVE the thumb's MCP base (lms[2]) — pointing up
-  const thumbUp = lms[4].y < lms[2].y - 0.06;
-  // Thumb tip must also be above wrist
-  const aboveWrist = lms[4].y < lms[0].y - 0.04;
-  return thumbUp && aboveWrist;
-}
+// function isThumbsUp(lms) {
+//   // All 4 fingers must be curled
+//   const pairs = [[8,6],[12,10],[16,14],[20,18]];
+//   for (const [tip, pip] of pairs) {
+//     if (lms[tip].y < lms[pip].y - 0.02) return false; // finger extended
+//   }
+//   // Thumb tip must be clearly ABOVE the thumb's MCP base (lms[2]) — pointing up
+//   const thumbUp = lms[4].y < lms[2].y - 0.06;
+//   // Thumb tip must also be above wrist
+//   const aboveWrist = lms[4].y < lms[0].y - 0.04;
+//   return thumbUp && aboveWrist;
+// }
 
 // ── Menu scroll via gesture hold ─────────────────────────────────
 // Interval between scroll steps while gesture is held (ms)
-const SCROLL_INTERVAL_MS  = 160;
-// Delay before auto-scroll starts after fist is formed (ms)
-const SCROLL_START_DELAY  = 280;
+// const SCROLL_INTERVAL_MS  = 160;
+// // Delay before auto-scroll starts after fist is formed (ms)
+// const SCROLL_START_DELAY  = 280;
 
-function updateScrollGesture(side, gesture) {
-  // gesture: 'fist' | 'one-finger' | null
-  const h = hands[side];
-  const menuEl = document.getElementById('menu-' + side);
-  const badge  = document.getElementById('badge-' + side);
+// function updateScrollGesture(side, gesture) {
+//   // gesture: 'fist' | 'one-finger' | null
+//   const h = hands[side];
+//   const menuEl = document.getElementById('menu-' + side);
+//   const badge  = document.getElementById('badge-' + side);
 
-  if (gesture === h.scrollGesture) return; // no change
+//   if (gesture === h.scrollGesture) return; // no change
 
-  // Clear previous scroll timer
-  clearTimeout(h.scrollTimer);
-  clearInterval(h._scrollInterval);
-  menuEl.classList.remove('scrolling-down', 'scrolling-up');
+//   // Clear previous scroll timer
+//   clearTimeout(h.scrollTimer);
+//   clearInterval(h._scrollInterval);
+//   menuEl.classList.remove('scrolling-down', 'scrolling-up');
 
-  h.scrollGesture = gesture;
+//   h.scrollGesture = gesture;
 
-  if (gesture === 'fist') {
-    // Scroll DOWN (forward) — advance through list
-    badge.textContent = '✊';
-    menuEl.classList.add('scrolling-down');
-    const doScroll = () => { menuScroll(side, 1); };
-    h.scrollTimer = setTimeout(() => {
-      doScroll();
-      h._scrollInterval = setInterval(doScroll, SCROLL_INTERVAL_MS);
-    }, SCROLL_START_DELAY);
-  } else if (gesture === 'one-finger') {
-    // Scroll UP (reverse)
-    badge.textContent = '☝';
-    menuEl.classList.add('scrolling-up');
-    const doScroll = () => { menuScroll(side, -1); };
-    h.scrollTimer = setTimeout(() => {
-      doScroll();
-      h._scrollInterval = setInterval(doScroll, SCROLL_INTERVAL_MS);
-    }, SCROLL_START_DELAY);
-  } else {
-    badge.textContent = '';
-  }
-}
+//   if (gesture === 'fist') {
+//     // Scroll DOWN (forward) — advance through list
+//     badge.textContent = '✊';
+//     menuEl.classList.add('scrolling-down');
+//     const doScroll = () => { menuScroll(side, 1); };
+//     h.scrollTimer = setTimeout(() => {
+//       doScroll();
+//       h._scrollInterval = setInterval(doScroll, SCROLL_INTERVAL_MS);
+//     }, SCROLL_START_DELAY);
+//   } else if (gesture === 'one-finger') {
+//     // Scroll UP (reverse)
+//     badge.textContent = '☝';
+//     menuEl.classList.add('scrolling-up');
+//     const doScroll = () => { menuScroll(side, -1); };
+//     h.scrollTimer = setTimeout(() => {
+//       doScroll();
+//       h._scrollInterval = setInterval(doScroll, SCROLL_INTERVAL_MS);
+//     }, SCROLL_START_DELAY);
+//   } else {
+//     badge.textContent = '';
+//   }
+// }
 
 // ── Swipe detection ──────────────────────────────────────────────
 // New approach:
@@ -674,61 +719,61 @@ function updateScrollGesture(side, gesture) {
 //   • Requires movement to be >70% horizontal (directionality check)
 //   • Long cooldown (1.5s) so a single swipe can't multi-fire
 
-const SWIPE_COOLDOWN_MS  = 1500;
-const SWIPE_VELOCITY_MIN = 0.55;  // normalised units per second — must be fast
-const SWIPE_DIST_MIN     = 0.18;  // minimum total horizontal travel
-const SWIPE_WINDOW_MS    = 400;   // look-back window
+// const SWIPE_COOLDOWN_MS  = 1500;
+// const SWIPE_VELOCITY_MIN = 0.55;  // normalised units per second — must be fast
+// const SWIPE_DIST_MIN     = 0.18;  // minimum total horizontal travel
+// const SWIPE_WINDOW_MS    = 400;   // look-back window
 
-function detectSwipe(side, lms) {
-  const h   = hands[side];
-  const now = performance.now();
+// function detectSwipe(side, lms) {
+//   const h   = hands[side];
+//   const now = performance.now();
 
-  // Use wrist X in display space (mirrored: 1 - lms[0].x)
-  const xNow = 1 - lms[0].x;
-  const yNow = lms[0].y;
+//   // Use wrist X in display space (mirrored: 1 - lms[0].x)
+//   const xNow = 1 - lms[0].x;
+//   const yNow = lms[0].y;
 
-  h.xHistory.push({ t: now, x: xNow, y: yNow });
-  // Prune old entries
-  while (h.xHistory.length > 0 && now - h.xHistory[0].t > SWIPE_WINDOW_MS) {
-    h.xHistory.shift();
-  }
+//   h.xHistory.push({ t: now, x: xNow, y: yNow });
+//   // Prune old entries
+//   while (h.xHistory.length > 0 && now - h.xHistory[0].t > SWIPE_WINDOW_MS) {
+//     h.xHistory.shift();
+//   }
 
-  // Enforce cooldown
-  if (h.swipeCd > now) return null;
-  // Need enough history
-  if (h.xHistory.length < 5) return null;
+//   // Enforce cooldown
+//   if (h.swipeCd > now) return null;
+//   // Need enough history
+//   if (h.xHistory.length < 5) return null;
 
-  // GATE: must be a fist right now
-  if (!isFist(lms)) return null;
+//   // GATE: must be a fist right now
+//   if (!isFist(lms)) return null;
 
-  const oldest  = h.xHistory[0];
-  const dt      = (now - oldest.t) / 1000; // seconds
-  const dx      = xNow - oldest.x;         // horizontal travel
-  const dy      = yNow - oldest.y;         // vertical travel
+//   const oldest  = h.xHistory[0];
+//   const dt      = (now - oldest.t) / 1000; // seconds
+//   const dx      = xNow - oldest.x;         // horizontal travel
+//   const dy      = yNow - oldest.y;         // vertical travel
 
-  // Directionality: horizontal travel must dominate
-  if (Math.abs(dx) < Math.abs(dy) * 1.8) return null;
+//   // Directionality: horizontal travel must dominate
+//   if (Math.abs(dx) < Math.abs(dy) * 1.8) return null;
 
-  // Distance threshold
-  if (Math.abs(dx) < SWIPE_DIST_MIN) return null;
+//   // Distance threshold
+//   if (Math.abs(dx) < SWIPE_DIST_MIN) return null;
 
-  // Velocity threshold — must be a brisk flick, not a slow drift
-  const velocity = Math.abs(dx) / dt;
-  if (velocity < SWIPE_VELOCITY_MIN) return null;
+//   // Velocity threshold — must be a brisk flick, not a slow drift
+//   const velocity = Math.abs(dx) / dt;
+//   if (velocity < SWIPE_VELOCITY_MIN) return null;
 
-  // Confirmed swipe!
-  h.swipeCd  = now + SWIPE_COOLDOWN_MS;
-  h.xHistory = [];
-  dbg(`Swipe! dx=${dx.toFixed(3)} vel=${velocity.toFixed(2)}`);
-  return 'new-sound';
-}
+//   // Confirmed swipe!
+//   h.swipeCd  = now + SWIPE_COOLDOWN_MS;
+//   h.xHistory = [];
+//   dbg(`Swipe! dx=${dx.toFixed(3)} vel=${velocity.toFixed(2)}`);
+//   return 'new-sound';
+// }
 
 const flashTimers={};
 function flashCard(side){const el=document.getElementById('flash-'+side);el.classList.add('show');clearTimeout(flashTimers[side]);flashTimers[side]=setTimeout(()=>el.classList.remove('show'),220);}
 
 const swipeArrows={left:0,right:0};
 function drawSwipeArrow(ctx,side,cx,cy){
-  const color=side==='left'?'#9B8FE8':'#5DCAA5',len=40,hw=10;
+  const color=side==='left'?'#D26A25':'#258DD2',len=40,hw=10;
   ctx.save();ctx.strokeStyle=color;ctx.fillStyle=color;ctx.lineWidth=2.5;ctx.globalAlpha=0.85;
   ctx.beginPath();ctx.moveTo(cx-len/2,cy);ctx.lineTo(cx+len/2,cy);ctx.stroke();
   ctx.beginPath();ctx.moveTo(cx+len/2,cy);ctx.lineTo(cx+len/2-hw,cy-hw/2);ctx.lineTo(cx+len/2-hw,cy+hw/2);ctx.closePath();ctx.fill();
@@ -753,6 +798,11 @@ document.getElementById('start-btn').addEventListener('click', async () => {
   if (started) return;
   started = true;
   document.getElementById('setup').style.display = 'none';
+    
+  document.getElementById('menu-right-title').style.display='block';
+  document.getElementById('menu-left-title').style.display='block';
+  //document.getElementById('menu-title-back').style.display='block';
+  document.getElementById('header').style.display='none';
 
   await Tone.start();
   buildChain('left');
@@ -780,7 +830,7 @@ document.getElementById('start-btn').addEventListener('click', async () => {
       results.multiHandLandmarks.forEach((lms,i) => {
         const label=results.multiHandedness[i].label;
         const side=label==='Right'?'left':'right';
-        const color=side==='left'?'#9B8FE8':'#5DCAA5';
+        const color=side==='left'?'#D26A25':'#258DD2';
         const h=hands[side];
 
         const wrist=lms[0];
@@ -792,57 +842,33 @@ document.getElementById('start-btn').addEventListener('click', async () => {
         const vol=spreadToVol(spread);
         const volPct=Math.round(spread*100);
         const pitchSt=(pitch>=0?'+':'')+pitch.toFixed(1)+' st';
-        const fingers=extendedFingers(lms);
-        const gesture=detectSwipe(side, lms);
-        if(gesture==='new-sound'){ swipeArrows[side]=performance.now(); triggerNewSound(side); }
-
-        // ── Gesture-scroll menu ──────────────────────────────────
-        const fist     = isFist(lms);
-        const oneFinger= isOneFingerUp(lms);
-        const thumbsUp = isThumbsUp(lms);
-
-        let scrollGesture = null;
-        if (fist)      scrollGesture = 'fist';
-        else if (oneFinger) scrollGesture = 'one-finger';
-        updateScrollGesture(side, scrollGesture);
-
-        // Thumbs up → select highlighted sound (debounced)
-        const h2 = hands[side];
-        if (thumbsUp && !fist) {
-          const now2 = performance.now();
-          if (now2 - (h2.lastPalmSelect||0) > 1200) {
-            h2.lastPalmSelect = now2;
-            menuSelect(side);
-            flashCard(side);
-            dbg(`Thumbs up select: ${side}`);
-          }
-        }
 
         // Only apply pitch/vol when NOT in a fist (avoids pitch jumps during scroll)
-        if(!fist){
-          if(h2.pitch) h2.pitch.pitch=pitch;
-          if(h2.vol)   h2.vol.volume.rampTo(vol,0.1);
-        }
+        if(h.pitch) h.pitch.pitch=pitch;
+        if(h.vol)   h.vol.volume.rampTo(vol,0.1);   
 
         // Skeleton
-        const CONN=[[0,1],[1,2],[2,3],[3,4],[0,5],[5,6],[6,7],[7,8],[0,9],[9,10],[10,11],[11,12],[0,13],[13,14],[14,15],[15,16],[0,17],[17,18],[18,19],[19,20],[5,9],[9,13],[13,17]];
-        ctx.strokeStyle=color;ctx.lineWidth=1.5;ctx.globalAlpha=0.65;
-        CONN.forEach(([a,b])=>{ctx.beginPath();ctx.moveTo((1-lms[a].x)*overlay.width,lms[a].y*overlay.height);ctx.lineTo((1-lms[b].x)*overlay.width,lms[b].y*overlay.height);ctx.stroke();});
+        // const CONN=[[0,1],[1,2],[2,3],[3,4],[0,5],[5,6],[6,7],[7,8],[0,9],[9,10],[10,11],[11,12],[0,13],[13,14],[14,15],[15,16],[0,17],[17,18],[18,19],[19,20],[5,9],[9,13],[13,17]];
+        // ctx.strokeStyle=color;ctx.lineWidth=1.5;ctx.globalAlpha=0.65;
+        // CONN.forEach(([a,b])=>{ctx.beginPath();ctx.moveTo((1-lms[a].x)*overlay.width,lms[a].y*overlay.height);ctx.lineTo((1-lms[b].x)*overlay.width,lms[b].y*overlay.height);ctx.stroke();});
+
         lms.forEach(lm=>{ctx.beginPath();ctx.arc((1-lm.x)*overlay.width,lm.y*overlay.height,3.5,0,Math.PI*2);ctx.fillStyle=color;ctx.globalAlpha=0.85;ctx.fill();});
         ctx.globalAlpha=1;
 
         // Spread circle
         const palmX=(1-lms[9].x)*overlay.width,palmY=lms[9].y*overlay.height;
-        ctx.beginPath();ctx.arc(palmX,palmY,14+spread*50,0,Math.PI*2);
-        ctx.strokeStyle=color;ctx.lineWidth=1;ctx.globalAlpha=0.2+spread*0.4;ctx.stroke();ctx.globalAlpha=1;
+        ctx.beginPath();ctx.arc(palmX,palmY,5+spread*150,0,Math.PI*2);
+        // ctx.strokeStyle=color;ctx.lineWidth=1;ctx.globalAlpha=0.2+spread*0.4;ctx.stroke();
+        ctx.fillStyle=color;ctx.globalAlpha=spread*0.3;ctx.fill();
+        ctx.globalAlpha=1;
 
         // Labels
         const sName=h.sound?h.sound.name.slice(0,24):(h.loading?'loading…':'—');
         ctx.font='italic 300 12px "Cormorant Garamond",serif';ctx.fillStyle=color;ctx.globalAlpha=0.8;
         ctx.fillText(sName,Math.max(4,wx-32),wy-30);ctx.globalAlpha=1;
         ctx.font='400 10px "Inconsolata",monospace';ctx.fillStyle=color;
-        const gestureLabel = fist ? '✊ scrolling ↓' : oneFinger ? '☝ scrolling ↑' : thumbsUp ? '👍 select!' : '🖐 '+fingers;
-        ctx.fillText(`${pitchSt}  ${gestureLabel}`,wx+10,wy-12);
+        // // const gestureLabel = fist ? '✊ scrolling ↓' : oneFinger ? '☝ scrolling ↑' : thumbsUp ? '👍 select!' : '🖐 '+fingers;
+        // ctx.fillText(`${pitchSt}  ${gestureLabel}`,wx+10,wy-12);
 
         if(performance.now()-swipeArrows[side]<600) drawSwipeArrow(ctx,side,wx,wy+20);
 
@@ -856,8 +882,9 @@ document.getElementById('start-btn').addEventListener('click', async () => {
       });
     }
 
-    if(!seenLeft&&hands.left.active){ if(hands.left.vol)hands.left.vol.volume.rampTo(-40,0.2);hands.left.active=false;updateScrollGesture('left',null);document.getElementById('left-pitch-label').textContent='pitch: —';document.getElementById('left-vol-label').textContent='vol: —';document.getElementById('left-bar').style.width='0%'; }
-    if(!seenRight&&hands.right.active){ if(hands.right.vol)hands.right.vol.volume.rampTo(-40,0.2);hands.right.active=false;updateScrollGesture('right',null);document.getElementById('right-pitch-label').textContent='pitch: —';document.getElementById('right-vol-label').textContent='vol: —';document.getElementById('right-bar').style.width='0%'; }
+    if(!seenLeft&&hands.left.active){ if(hands.left.vol)hands.left.vol.volume.rampTo(-40,0.2);hands.left.active=false;
+    document.getElementById('left-pitch-label').textContent='pitch: —';document.getElementById('left-vol-label').textContent='vol: —';document.getElementById('left-bar').style.width='0%'; }
+    if(!seenRight&&hands.right.active){ if(hands.right.vol)hands.right.vol.volume.rampTo(-40,0.2);hands.right.active=false;document.getElementById('right-pitch-label').textContent='pitch: —';document.getElementById('right-vol-label').textContent='vol: —';document.getElementById('right-bar').style.width='0%'; }
   });
 
   try {
@@ -878,3 +905,70 @@ document.getElementById('start-btn').addEventListener('click', async () => {
     started=false;
   }
 });
+
+const menuLeftTitle = document.getElementById("menu-left-title");
+const menuRightTitle = document.getElementById("menu-right-title");
+const menuLeftInner = document.getElementById("menu-inner-left");
+const menuRightInner = document.getElementById("menu-inner-right");
+const menuLeft = document.getElementById("menu-left");
+const menuRight = document.getElementById("menu-right");
+
+menuLeftTitle.addEventListener("click", ()=> {
+    menuLeftInner.classList.toggle("show");
+    menuLeft.classList.toggle("show");
+})
+
+menuRightTitle.addEventListener("click", ()=> {
+    menuRightInner.classList.toggle("show");
+    menuRight.classList.toggle("show");
+})
+
+let activeMenuSide = 'left'; // default
+
+document.getElementById('menu-left').addEventListener('click', () => { activeMenuSide = 'left'; });
+document.getElementById('menu-right').addEventListener('click', () => { activeMenuSide = 'right'; });
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowDown') {
+    menuScroll(activeMenuSide, 1);
+    menus[activeMenuSide].pendingIdx = menus[activeMenuSide].cursor;
+    renderMenu(activeMenuSide);
+    menuSelect(activeMenuSide);
+  }
+  if (e.key === 'ArrowUp') {
+    menuScroll(activeMenuSide, -1);
+    menus[activeMenuSide].pendingIdx = menus[activeMenuSide].cursor;
+    renderMenu(activeMenuSide);
+    menuSelect(activeMenuSide);
+  }
+});
+
+menuLeftTitle.addEventListener('click', () => { activeMenuSide = 'left'; });
+menuRightTitle.addEventListener('click', () => { activeMenuSide = 'right'; });
+
+function updateMenuLabels() {
+  if (window.innerWidth <= 600) {
+    document.getElementById('menu-left-title').innerHTML = 'L';
+    document.getElementById('menu-right-title').innerHTML = 'R';
+  } else {
+    document.getElementById('menu-left-title').innerHTML = 'LEFT HAND ↓';
+    document.getElementById('menu-right-title').innerHTML = '↓ RIGHT HAND';
+  }
+}
+
+updateMenuLabels();
+window.addEventListener('resize', updateMenuLabels);
+
+// function resizeLayerIcons() {
+//   if (window.innerWidth <= 600) {
+//     muteBtn.textContent= "M";
+//     muteBtn.textContent = layer.muted ? 'UM' : 'M';
+//   } else {
+//     muteBtn.textContent = 'mute';
+//     muteBtn.textContent = layer.muted ? 'unmute' : 'mute';
+//   }
+// }
+
+// resizeLayerIcons();
+// window.addEventListener('resize', resizeLayerIcons);
+

@@ -6,7 +6,7 @@
     --left:  #D26A25;
     --right: #258DD2;
     --rec:   #E24B4A;
-    --bg:    #ede9da;
+    --bg:    #e8e1c8;
     --surf:  #16141F;
     --bord:  #16141F;
     --text:  #16141F;
@@ -441,6 +441,9 @@
 
 
 @media screen and (max-width: 800px) {
+    /* *:hover{
+        all: unset;
+    } */
   #info{
     width: 90%;
     left: 5%;
@@ -496,8 +499,3 @@
 
 }
 
-@media (hover: none) {
-  *:hover{
-    all: unset;
-  }
-}

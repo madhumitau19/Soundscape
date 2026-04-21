@@ -403,12 +403,6 @@ function renderLayerRow(layer, blob) {
   const muteBtn = document.createElement('button');
   muteBtn.className = 'layer-btn';
   muteBtn.textContent = 'mute';
-  muteBtn.addEventListener('click', () => {
-    layer.muted = !layer.muted;
-    muteBtn.classList.toggle('muted', layer.muted);
-    muteBtn.textContent = layer.muted ? 'unmute' : 'mute';
-    layer.volNode.volume.rampTo(layer.muted ? -Infinity : 20*Math.log10(Math.max(0.001,layer.gain)), 0.05);
-  });
   row.appendChild(muteBtn);
 
   function updateMuteLabel() {
@@ -423,10 +417,10 @@ function renderLayerRow(layer, blob) {
 
     // Update the existing click handler to use updateMuteLabel:
     muteBtn.addEventListener('click', () => {
-    layer.muted = !layer.muted;
-    muteBtn.classList.toggle('muted', layer.muted);
-    updateMuteLabel();
-    layer.volNode.volume.rampTo(layer.muted ? -Infinity : 20*Math.log10(Math.max(0.001,layer.gain)), 0.05);
+        layer.muted = !layer.muted;
+        muteBtn.classList.toggle('muted', layer.muted);
+        updateMuteLabel();
+        layer.volNode.volume.rampTo(layer.muted ? -Infinity : 20*Math.log10(Math.max(0.001,layer.gain)), 0.05);
     });
 
     window.addEventListener('resize', updateMuteLabel);

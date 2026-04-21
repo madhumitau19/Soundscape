@@ -495,3 +495,9 @@
 
 
 }
+
+@media (hover: none) {
+  *:hover{
+    all: unset;
+  }
+}

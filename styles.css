@@ -350,12 +350,13 @@
     min-height: 0;
     }
   #menu-inner-left.show, #menu-inner-right.show {
-    display: flex;
+    display: block !important;
     }
   .menu-item {
     padding:5px 12px; font-size:10px; letter-spacing:0.1em; text-transform:uppercase;
     color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
     transition:color 0.12s background 0.12s; cursor:default; line-height:1.6;
+    flex-shrink: 0;
   }
   .sound-menu.left  .menu-item { 
     text-align:left;
@@ -487,6 +488,7 @@
     min-height: 0;
     overflow-y: scroll;
     -webkit-overflow-scrolling: touch;
+    touch-action: pan-y;
 }
   #menu-left-title, #menu-right-title {
     z-index: 60;

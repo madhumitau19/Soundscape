@@ -279,6 +279,7 @@
     display: none;
     flex-direction: column;
     overflow: hidden; /* clip the scroll */
+    min-height: 0;
     }
 
 .sound-menu.show {
@@ -327,7 +328,7 @@
   /* #menu-title-back{
     display: none;
   } */
-  #menu-title-back{
+  /* #menu-title-back{
     position: fixed;
     top: 0;
     left: 0;
@@ -336,7 +337,7 @@
     background-color: black;
     z-index: 20;
     display: none;
-  }
+  } */
 
   .menu-inner {
     display: none;
@@ -346,6 +347,7 @@
     flex: 1;
     -webkit-overflow-scrolling: touch;
     flex: 1;
+    min-height: 0;
     }
   #menu-inner-left.show, #menu-inner-right.show {
     display: flex;

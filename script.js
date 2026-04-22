@@ -91,7 +91,7 @@ const menus = {
     inner.addEventListener('touchstart', e => {
     touchStartY = e.touches[0].clientY;
     touchAccum = 0;
-    }, { passive: true });
+    }, { passive: false });
 
   inner.addEventListener('touchmove', e => {
     e.preventDefault();

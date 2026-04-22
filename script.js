@@ -60,9 +60,7 @@ const menus = {
 
 ['left', 'right'].forEach(side => {
   const inner = document.getElementById(`menu-inner-${side}`);
-  const menuEl = document.getElementById(`menu-${side}`);
 
-  // Click to select
   inner.addEventListener('click', e => {
     const item = e.target.closest('.menu-item');
     if (!item) return;
@@ -73,7 +71,6 @@ const menus = {
     menuSelect(side);
   });
 
-  // Scroll wheel (desktop)
   let wheelCooldown = false;
   inner.addEventListener('wheel', e => {
     e.preventDefault();
@@ -82,30 +79,6 @@ const menus = {
     menuScroll(side, e.deltaY > 0 ? 1 : -1);
     setTimeout(() => { wheelCooldown = false; }, 120);
   }, { passive: false });
-
-  // Touch swipe (mobile)
-    let touchStartY = 0;
-    let touchAccum = 0;
-    const TOUCH_STEP = 30; // px per item scroll step
-
-    inner.addEventListener('touchstart', e => {
-    touchStartY = e.touches[0].clientY;
-    touchAccum = 0;
-    }, { passive: false });
-
-  inner.addEventListener('touchmove', e => {
-    e.preventDefault();
-    const dy = touchStartY - e.touches[0].clientY;
-    touchAccum += dy;
-    touchStartY = e.touches[0].clientY;
-
-    if (Math.abs(touchAccum) >= TOUCH_STEP) {
-        const steps = Math.floor(Math.abs(touchAccum) / TOUCH_STEP);
-        const dir = touchAccum > 0 ? 1 : -1;
-        for (let i = 0; i < steps; i++) menuScroll(side, dir);
-        touchAccum = touchAccum % TOUCH_STEP;
-    }
-    }, { passive: false });
 });
 
 function renderMenu(side) {

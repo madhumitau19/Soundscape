@@ -342,9 +342,10 @@
     display: none;
     flex-direction: column;
     gap: 0;
-    overflow-y: auto;
+    overflow-y: scroll;
     flex: 1;
-    /* remove transition and will-change — no longer using translateY */
+    -webkit-overflow-scrolling: touch;
+    flex: 1;
     }
   #menu-inner-left.show, #menu-inner-right.show {
     display: flex;

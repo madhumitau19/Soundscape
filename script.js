@@ -54,46 +54,13 @@ function pickRandom(excludeId) {
 const ITEM_H = 24; // px per menu item
 const VISIBLE = 7; // items visible at once; cursor is middle one
 const menus = {
-  left:  { cursor:0, active:false },
-  right: { cursor:0, active:false },
+  left:  { cursor:0, active:false, pendingIdx:-1 },
+  right: { cursor:0, active:false, pendingIdx:-1 },
 };
-
-function buildMenus() {
-  ['left','right'].forEach(side => {
-    const inner = document.getElementById(`menu-inner-${side}`);
-    inner.innerHTML = '';
-    soundPool.forEach((s, i) => {
-      const el = document.createElement('div');
-      el.className = 'menu-item';
-      el.dataset.idx = i;
-      el.textContent = s.name;
-      inner.appendChild(el);
-    });
-    menus[side].cursor = 0;
-    menus[side].pendingIdx = -1;
-    renderMenu(side);
-  });
-}
-
-function renderMenu(side) {
-  try {
-    const inner  = document.getElementById(`menu-inner-${side}`);
-    const items  = inner.querySelectorAll('.menu-item');
-    const cursor = menus[side].cursor;
-    const offset = -(cursor * ITEM_H) + (Math.floor(VISIBLE/2) * ITEM_H);
-    inner.style.transform = `translateY(${offset}px)`;
-    items.forEach((el, i) => {
-      el.classList.toggle('cursor',   i === cursor);
-      el.classList.toggle('selected', menus[side].pendingIdx === i);
-    });
-  } catch(e) {
-    console.error('renderMenu error:', e);
-  }
-}
-
 
 ['left', 'right'].forEach(side => {
   const inner = document.getElementById(`menu-inner-${side}`);
+  const menuEl = document.getElementById(`menu-${side}`);
 
   // Click to select
   inner.addEventListener('click', e => {
@@ -106,12 +73,71 @@ function renderMenu(side) {
     menuSelect(side);
   });
 
-  // Scroll wheel to move cursor
-  document.getElementById(`menu-${side}`).addEventListener('wheel', e => {
+  // Scroll wheel (desktop)
+  let wheelCooldown = false;
+  inner.addEventListener('wheel', e => {
     e.preventDefault();
+    if (wheelCooldown) return;
+    wheelCooldown = true;
     menuScroll(side, e.deltaY > 0 ? 1 : -1);
+    setTimeout(() => { wheelCooldown = false; }, 120);
+  }, { passive: false });
+
+  // Touch swipe (mobile)
+  let touchStartY = 0;
+  inner.addEventListener('touchstart', e => {
+    touchStartY = e.touches[0].clientY;
+  }, { passive: true });
+
+  inner.addEventListener('touchmove', e => {
+    e.preventDefault();
+    const dy = touchStartY - e.touches[0].clientY;
+    if (Math.abs(dy) > 10) {
+      menuScroll(side, dy > 0 ? 1 : -1);
+      touchStartY = e.touches[0].clientY;
+    }
   }, { passive: false });
 });
+
+function renderMenu(side) {
+  try {
+    const inner = document.getElementById(`menu-inner-${side}`);
+    const items = inner.querySelectorAll('.menu-item');
+    const cursor = menus[side].cursor;
+    items.forEach((el, i) => {
+      el.classList.toggle('cursor', i === cursor);
+      el.classList.toggle('selected', menus[side].pendingIdx === i);
+    });
+    // Scroll cursor item into view
+    if (items[cursor]) {
+      items[cursor].scrollIntoView({ block: 'nearest' });
+    }
+  } catch(e) {
+    console.error('renderMenu error:', e);
+  }
+}
+
+
+// ['left', 'right'].forEach(side => {
+//   const inner = document.getElementById(`menu-inner-${side}`);
+
+//   // Click to select
+//   inner.addEventListener('click', e => {
+//     const item = e.target.closest('.menu-item');
+//     if (!item) return;
+//     const idx = parseInt(item.dataset.idx, 10);
+//     menus[side].cursor = idx;
+//     menus[side].pendingIdx = idx;
+//     renderMenu(side);
+//     menuSelect(side);
+//   });
+
+//   // Scroll wheel to move cursor
+//   document.getElementById(`menu-${side}`).addEventListener('wheel', e => {
+//     e.preventDefault();
+//     menuScroll(side, e.deltaY > 0 ? 1 : -1);
+//   }, { passive: false });
+// });
 
 function menuScroll(side, delta) {
   // delta: -1 = up (prev), +1 = down (next)
@@ -894,8 +920,8 @@ document.getElementById('start-btn').addEventListener('click', async () => {
     document.getElementById('rec-panel').style.display='flex';
     document.getElementById('hint').style.display='block';
     document.getElementById('pitch-strip').style.display='flex';
-    document.getElementById('menu-left').classList.add('active');
-    document.getElementById('menu-right').classList.add('active');
+    document.getElementById('menu-left').classList.add('show');
+    document.getElementById('menu-right').classList.add('show');    
     
   } catch(e) {
     setStatus('Camera access denied — please allow permissions and reload.');
@@ -910,15 +936,13 @@ const menuRightInner = document.getElementById("menu-inner-right");
 const menuLeft = document.getElementById("menu-left");
 const menuRight = document.getElementById("menu-right");
 
-menuLeftTitle.addEventListener("click", ()=> {
-    menuLeftInner.classList.toggle("show");
+menuLeftTitle.addEventListener("click", () => {
     menuLeft.classList.toggle("show");
-})
+});
 
-menuRightTitle.addEventListener("click", ()=> {
-    menuRightInner.classList.toggle("show");
+menuRightTitle.addEventListener("click", () => {
     menuRight.classList.toggle("show");
-})
+});
 
 let activeMenuSide = 'left'; // default
 
@@ -976,3 +1000,21 @@ instructionBtn.addEventListener('click', ()=>{
 // resizeLayerIcons();
 // window.addEventListener('resize', resizeLayerIcons);
 
+function buildMenus() {
+  ['left','right'].forEach(side => {
+    const inner = document.getElementById(`menu-inner-${side}`);
+    inner.innerHTML = '';
+    soundPool.forEach((s, i) => {
+      const el = document.createElement('div');
+      el.className = 'menu-item';
+      el.dataset.idx = i;
+      el.textContent = s.name;
+      inner.appendChild(el);
+    });
+    menus[side].cursor = 0;
+    menus[side].pendingIdx = -1;
+    renderMenu(side);
+    // ADD THIS — show inner once populated
+    inner.classList.add('show');
+  });
+}

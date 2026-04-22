@@ -84,19 +84,28 @@ const menus = {
   }, { passive: false });
 
   // Touch swipe (mobile)
-  let touchStartY = 0;
-  inner.addEventListener('touchstart', e => {
+    let touchStartY = 0;
+    let touchAccum = 0;
+    const TOUCH_STEP = 30; // px per item scroll step
+
+    inner.addEventListener('touchstart', e => {
     touchStartY = e.touches[0].clientY;
-  }, { passive: true });
+    touchAccum = 0;
+    }, { passive: true });
 
   inner.addEventListener('touchmove', e => {
     e.preventDefault();
     const dy = touchStartY - e.touches[0].clientY;
-    if (Math.abs(dy) > 10) {
-      menuScroll(side, dy > 0 ? 1 : -1);
-      touchStartY = e.touches[0].clientY;
+    touchAccum += dy;
+    touchStartY = e.touches[0].clientY;
+
+    if (Math.abs(touchAccum) >= TOUCH_STEP) {
+        const steps = Math.floor(Math.abs(touchAccum) / TOUCH_STEP);
+        const dir = touchAccum > 0 ? 1 : -1;
+        for (let i = 0; i < steps; i++) menuScroll(side, dir);
+        touchAccum = touchAccum % TOUCH_STEP;
     }
-  }, { passive: false });
+    }, { passive: false });
 });
 
 function renderMenu(side) {

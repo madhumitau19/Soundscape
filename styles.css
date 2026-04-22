@@ -472,6 +472,7 @@
     z-index: 50;
     display: none;
     flex-direction: column;
+    box-sizing: border-box;
   }
   #menu-left.show{
     display: flex;
@@ -481,6 +482,7 @@
   }
   
 .menu-inner{
+    height: 0;
     flex: 1;
     min-height: 0;
     overflow-y: scroll;

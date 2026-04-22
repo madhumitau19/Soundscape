@@ -471,14 +471,21 @@
     background-color: var(--bg);
     z-index: 50;
     display: none;
+    flex-direction: column;
   }
   #menu-left.show{
-    display: block;
+    display: flex;
   }
   #menu-right.show{
-    display: block;
+    display: flex;
   }
   
+.menu-inner{
+    flex: 1;
+    min-height: 0;
+    overflow-y: scroll;
+    -webkit-overflow-scrolling: touch;
+}
   #menu-left-title, #menu-right-title {
     z-index: 60;
   }

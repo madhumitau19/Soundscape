@@ -106,8 +106,11 @@
     width:50%;
     position: fixed;
     left: 25%;
-    bottom: 25vh; 
-    gap:12px; 
+    top: 60px;
+    max-height: 80vh;
+    /* background-color: red;  */
+    gap:12px;
+    overflow: hidden; 
     }
 
 #hand-cards{
@@ -195,11 +198,19 @@
     text-align: center;
     }   
 
-  #layers-list { display:flex; flex-direction:column; gap:10px; width:100%; }
+  #layers-list { 
+    display:flex; 
+    flex-direction:column; 
+    gap:10px; 
+    width:100%;
+    max-height: 41vh;
+    overflow-y: scroll;  
+    }
 
   .layer-row {
     display:flex; align-items:center; gap:10px; padding:10px 20px; border:1px solid rgba(108, 0, 52, 0); position:relative; overflow:hidden; backdrop-filter:blur(4px);
     border-radius: 30px;
+    min-height: 50px;
   }
   .layer-row.playing { border-color:rgba(108, 0, 52, 0.35); }
 
@@ -303,11 +314,17 @@
     cursor: pointer;
     pointer-events: auto;
     z-index: 30;
-    background-color:var(--left);
+    /* background-color:var(--left); */
+    border: solid var(--left) 1px;
     padding: 10px 30px;
-    color: var(--bg);
+    color: var(--left);
     border-radius: 100px;
     display: none;
+    transition: all 0.2s ease-in-out;
+  }
+  #menu-left-title:hover{
+    background-color: var(--left);
+    color: var(--bg);
   }
   /* #menu-right-title{
     display: none;
@@ -319,11 +336,17 @@
     cursor: pointer;
     pointer-events: auto;
     z-index: 30;
-    background-color:var(--right);
+    /* background-color:var(--right); */
     padding: 10px 30px;
-    color: var(--bg);
+    color: var(--right);
+    border: solid var(--right) 1px;
     border-radius: 100px;
     display: none;
+    transition: all 0.2s ease-in-out;
+  }
+  #menu-right-title:hover{
+    background-color: var(--right);
+    color: var(--bg);
   }
   /* #menu-title-back{
     display: none;
@@ -343,7 +366,7 @@
     display: none;
     flex-direction: column;
     gap: 0;
-    overflow-y: scroll;
+    /* overflow-y: scroll; */
     flex: 1;
     -webkit-overflow-scrolling: touch;
     flex: 1;
@@ -423,7 +446,7 @@
     border: solid var(--bord) 1px;
     background-color: var(--bg);
     position: fixed;
-    top: 57px;
+    top: calc(50vh - 125px);
     left: calc(50vw - 150px);
     z-index: 100;
     border-radius: 50px;
@@ -431,6 +454,8 @@
   }
   #instruction.show{
     display: flex;
+    justify-content: center;
+    align-items: center;
   }
 
   #instruction-button{
@@ -440,13 +465,19 @@
     cursor: pointer;
     pointer-events: auto;
     z-index: 100;
-    background-color:var(--bord);
+    /* background-color:var(--bord); */
     padding: 10px 30px;
-    color: var(--bg);
+    color: var(--bord);
+    border: solid var(--bord) 1px;
     border-radius: 100px;
     display: none;
     width: 70px;
     justify-content: center;
+    transition: all 0.2s ease-in-out;
+  }
+  #instruction-button:hover{
+    background-color: var(--bord);
+    color: var(--bg);
   }
 
   #instruction-button.show{

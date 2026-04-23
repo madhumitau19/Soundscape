@@ -477,7 +477,7 @@ function renderLayerRow(layer, blob) {
   });
   row.appendChild(dlBtn);
 
-  list.appendChild(row);
+  list.prepend(row);
 
   // Animate progress bar
   setInterval(() => {
@@ -805,7 +805,7 @@ document.getElementById('start-btn').addEventListener('click', async () => {
   document.getElementById('menu-left-title').style.display='block';
   //document.getElementById('menu-title-back').style.display='block';
   document.getElementById('header').style.display='none';
-  document.getElementById('instruction').classList.add('show');
+//   document.getElementById('instruction').classList.add('show');
   document.getElementById('instruction-button').classList.add('show');
 
   await Tone.start();

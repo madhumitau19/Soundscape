@@ -94,6 +94,8 @@
     position:relative; 
     transition:border-color 0.2s,background 0.2s; 
     border-radius: 30px;
+    position: fixed;
+    top: 48dvh;
     }
 
   #start-btn::before,#start-btn::after { content:''; position:absolute; width:7px; height:7px;  }

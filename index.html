@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sound Collage Conductor</title>
+<title>Soundscapes</title>
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -27,9 +27,16 @@
 
   <div id="status"></div>
   <div id="debug-box"></div>
-  <div id="menu-title-back"></div>
-  <div id="menu-left-title">LEFT HAND ↓</div>
-  <div id="menu-right-title">↓ RIGHT HAND</div>
+
+  <div id="left-top">
+    <div id="menu-left-title">LEFT HAND ↓</div>
+    <div id="search-toggle-left">+</div>
+  </div>
+  <div id="right-top">
+    <div id="search-toggle-right">+</div>
+    <div id="menu-right-title">↓ RIGHT HAND</div>
+  </div>
+
   <div class="sound-menu left" id="menu-left">
       
       <div class="menu-inner" id="menu-inner-left"></div>
@@ -115,13 +122,42 @@
 
   <div id="instruction-button">HOW</div>
   <div id="instruction">
-    In Progress!
+    START TUTORIAL?
+    <div id="tut-confirm">
+      <div id="tut-yes">YES</div>
+      <div id="tut-no">CLOSE</div>
+    </div>
   </div>
+  <div id="pitch-vol-highlight-left" class="pitch-vol-highlight">→</div>
+  <div id="pitch-vol-highlight-right" class="pitch-vol-highlight">←</div>
+  <div id="sound-menu-highlight-left" class="sound-menu-highlight"></div>
+  <div id="sound-menu-highlight-right" class="sound-menu-highlight"></div>
+  <div id="more-sounds-highlight-left" class="more-sounds-highlight"></div>
+  <div id="more-sounds-highlight-right" class="more-sounds-highlight"></div>
+  <div class="record-highlight"></div>
+  <div class="mix-highlight"></div>
 
-  <!-- <div id="hint">
-    Up / Down &nbsp;→&nbsp; pitch &nbsp;·&nbsp; Spread / close &nbsp;→&nbsp; volume<br>
-    ✊ Fist &nbsp;→&nbsp; scroll menu down &nbsp;·&nbsp; ☝ One finger &nbsp;→&nbsp; scroll up &nbsp;·&nbsp; 👍 Thumbs up &nbsp;→&nbsp; select &amp; play
-  </div> -->
+  <div id="search-left" class="search-window">
+  <div class="search-window-header">You can use any sounds available on <a href="https://freesound.org/?feedbackRegistration=1" target="_blank">freesound.org</a>- search here:</div>
+  <div class="search-window-input-row">
+    <input type="text" class="search-window-input" id="search-input-left" placeholder="type to search…" />
+    <button class="search-window-btn" id="search-btn-left">GO</button>
+  </div>
+  <div class="search-window-results" id="search-results-left"></div>
+</div>
+
+<div id="search-right" class="search-window">
+  <div class="search-window-header">You can use any sounds available on <a href="https://freesound.org/?feedbackRegistration=1" target="_blank">freesound.org</a>- search here:</div>
+  <div class="search-window-input-row">
+    <input type="text" class="search-window-input" id="search-input-right" placeholder="type to search…" />
+    <button class="search-window-btn" id="search-btn-right">go</button>
+  </div>
+  <div class="search-window-results" id="search-results-right"></div>
+</div>
+
+
+
+
 </main>
 
 <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>

@@ -1,3 +1,5 @@
+let seenLeft = false;
+let seenRight = false;
 // ═══════════════════════════════════════════════════════════════════
 //  CONFIG
 // ═══════════════════════════════════════════════════════════════════
@@ -14,31 +16,31 @@ const SEARCH_QUERIES = ['ambient','field recording','texture','drone','nature lo
 
 async function fetchPool() {
   setStatus('Loading sounds…');
+  
+  const SOUND_IDS = [
+    846079, 389773, 218551, 582359, 849847, 851238, 851157, 849437, 851581, 851168, 851170, 844138, 842746, 850840, 848608, 851085, 850883, 851337, 851268, 850502, 850414, 848395, 830144, 847437, 846508, 846032, 843183, 844922, 847180, 849806
+  ];
+
   try {
-    const query = SEARCH_QUERIES[Math.floor(Math.random() * SEARCH_QUERIES.length)];
-    const page  = Math.floor(Math.random() * 10) + 1;
-    const params = new URLSearchParams({
-      query, page, page_size: 30,
-      filter: `duration:[${MIN_DUR} TO ${MAX_DUR}]`,
-      fields: 'id,name,tags,previews',
-      token:  API_KEY,
-    });
-    const res  = await fetch(`https://freesound.org/apiv2/search/text/?${params}`);
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const data = await res.json();
-    soundPool = (data.results || []).map(s => ({
-      id:         s.id,
-      name:       s.name.replace(/\.[^.]+$/, '').slice(0, 48),
-      tags:       (s.tags || []).slice(0, 5).join(' · '),
-      // Prefer LQ — much smaller files, loads in ~1s instead of 10s
-      previewUrl: s.previews?.['preview-lq-mp3'] || s.previews?.['preview-hq-mp3'],
-    })).filter(s => s.previewUrl);
+    const results = await Promise.all(SOUND_IDS.map(async id => {
+      const res = await fetch(`https://freesound.org/apiv2/sounds/${id}/?fields=id,name,tags,previews&token=${API_KEY}`);
+      if (!res.ok) return null;
+      const s = await res.json();
+      return {
+        id: s.id,
+        name: s.name.replace(/\.[^.]+$/, '').slice(0, 48),
+        tags: (s.tags || []).slice(0, 5).join(' · '),
+        previewUrl: s.previews?.['preview-lq-mp3'] || s.previews?.['preview-hq-mp3'],
+      };
+    }));
+
+    soundPool = results.filter(s => s && s.previewUrl);
     if (!soundPool.length) throw new Error('No results');
-    dbg(`Pool: ${soundPool.length} sounds (query: "${query}")`);
+    dbg(`Pool: ${soundPool.length} sounds (curated)`);
     buildMenus();
   } catch(e) {
     dbg('fetchPool error: ' + e.message);
-    setStatus('Could not load sounds — check API key');
+    setStatus('Could not load sounds — check IDs or API key');
   }
   setStatus('');
 }
@@ -98,28 +100,6 @@ function renderMenu(side) {
     console.error('renderMenu error:', e);
   }
 }
-
-
-// ['left', 'right'].forEach(side => {
-//   const inner = document.getElementById(`menu-inner-${side}`);
-
-//   // Click to select
-//   inner.addEventListener('click', e => {
-//     const item = e.target.closest('.menu-item');
-//     if (!item) return;
-//     const idx = parseInt(item.dataset.idx, 10);
-//     menus[side].cursor = idx;
-//     menus[side].pendingIdx = idx;
-//     renderMenu(side);
-//     menuSelect(side);
-//   });
-
-//   // Scroll wheel to move cursor
-//   document.getElementById(`menu-${side}`).addEventListener('wheel', e => {
-//     e.preventDefault();
-//     menuScroll(side, e.deltaY > 0 ? 1 : -1);
-//   }, { passive: false });
-// });
 
 function menuScroll(side, delta) {
   // delta: -1 = up (prev), +1 = down (next)
@@ -799,13 +779,19 @@ let started = false;
 document.getElementById('start-btn').addEventListener('click', async () => {
   if (started) return;
   started = true;
+
+  let stream;
+  try {
+    stream=await navigator.mediaDevices.getUserMedia({video:{width:640,height:480,facingMode:'user'}});        
+  } catch(e) {
+    setStatus('Camera access denied — please allow permissions and reload.');
+    started=false;
+  };
+
   document.getElementById('setup').style.display = 'none';
-    
-  document.getElementById('menu-right-title').style.display='block';
-  document.getElementById('menu-left-title').style.display='block';
-  //document.getElementById('menu-title-back').style.display='block';
+  document.getElementById('left-top').style.display='flex';
+  document.getElementById('right-top').style.display='flex';
   document.getElementById('header').style.display='none';
-//   document.getElementById('instruction').classList.add('show');
   document.getElementById('instruction-button').classList.add('show');
 
   await Tone.start();
@@ -828,7 +814,8 @@ document.getElementById('start-btn').addEventListener('click', async () => {
     overlay.width=overlay.offsetWidth; overlay.height=overlay.offsetHeight;
     ctx.clearRect(0,0,overlay.width,overlay.height);
 
-    let seenLeft=false,seenRight=false;
+    seenLeft=false;
+    seenRight=false;
 
     if (results.multiHandLandmarks) {
       results.multiHandLandmarks.forEach((lms,i) => {
@@ -847,22 +834,14 @@ document.getElementById('start-btn').addEventListener('click', async () => {
         const volPct=Math.round(spread*100);
         const pitchSt=(pitch>=0?'+':'')+pitch.toFixed(1)+' st';
 
-        // Only apply pitch/vol when NOT in a fist (avoids pitch jumps during scroll)
         if(h.pitch) h.pitch.pitch=pitch;
-        if(h.vol)   h.vol.volume.rampTo(vol,0.1);   
-
-        // Skeleton
-        // const CONN=[[0,1],[1,2],[2,3],[3,4],[0,5],[5,6],[6,7],[7,8],[0,9],[9,10],[10,11],[11,12],[0,13],[13,14],[14,15],[15,16],[0,17],[17,18],[18,19],[19,20],[5,9],[9,13],[13,17]];
-        // ctx.strokeStyle=color;ctx.lineWidth=1.5;ctx.globalAlpha=0.65;
-        // CONN.forEach(([a,b])=>{ctx.beginPath();ctx.moveTo((1-lms[a].x)*overlay.width,lms[a].y*overlay.height);ctx.lineTo((1-lms[b].x)*overlay.width,lms[b].y*overlay.height);ctx.stroke();});
+        if(h.vol)   h.vol.volume.rampTo(vol,0.1);  
 
         lms.forEach(lm=>{ctx.beginPath();ctx.arc((1-lm.x)*overlay.width,lm.y*overlay.height,3.5,0,Math.PI*2);ctx.fillStyle=color;ctx.globalAlpha=0.85;ctx.fill();});
         ctx.globalAlpha=1;
 
-        // Spread circle
         const palmX=(1-lms[9].x)*overlay.width,palmY=lms[9].y*overlay.height;
         ctx.beginPath();ctx.arc(palmX,palmY,5+spread*150,0,Math.PI*2);
-        // ctx.strokeStyle=color;ctx.lineWidth=1;ctx.globalAlpha=0.2+spread*0.4;ctx.stroke();
         ctx.fillStyle=color;ctx.globalAlpha=spread*0.3;ctx.fill();
         ctx.globalAlpha=1;
 
@@ -871,8 +850,6 @@ document.getElementById('start-btn').addEventListener('click', async () => {
         ctx.font='italic 300 12px "Cormorant Garamond",serif';ctx.fillStyle=color;ctx.globalAlpha=0.8;
         ctx.fillText(sName,Math.max(4,wx-32),wy-30);ctx.globalAlpha=1;
         ctx.font='400 10px "Inconsolata",monospace';ctx.fillStyle=color;
-        // // const gestureLabel = fist ? '✊ scrolling ↓' : oneFinger ? '☝ scrolling ↑' : thumbsUp ? '👍 select!' : '🖐 '+fingers;
-        // ctx.fillText(`${pitchSt}  ${gestureLabel}`,wx+10,wy-12);
 
         if(performance.now()-swipeArrows[side]<600) drawSwipeArrow(ctx,side,wx,wy+20);
 
@@ -891,24 +868,15 @@ document.getElementById('start-btn').addEventListener('click', async () => {
     if(!seenRight&&hands.right.active){ if(hands.right.vol)hands.right.vol.volume.rampTo(-40,0.2);hands.right.active=false;document.getElementById('right-pitch-label').textContent='pitch: —';document.getElementById('right-vol-label').textContent='vol: —';document.getElementById('right-bar').style.width='0%'; }
   });
 
-  try {
-    const stream=await navigator.mediaDevices.getUserMedia({video:{width:640,height:480,facingMode:'user'}});
-    video.srcObject=stream;
-    await new Promise(r=>{video.onloadedmetadata=r;});
-    new Camera(video,{onFrame:async()=>{await mp.send({image:video});},width:640,height:480}).start();
+  video.srcObject=stream;
+  await new Promise(r=>{video.onloadedmetadata=r;});
+  new Camera(video,{onFrame:async()=>{await mp.send({image:video});},width:640,height:480}).start();
 
-    document.getElementById('canvas-wrap').style.display='block';
-    document.getElementById('info').style.display='block';
-    document.getElementById('rec-panel').style.display='flex';
-    document.getElementById('hint').style.display='block';
-    document.getElementById('pitch-strip').style.display='flex';
-    document.getElementById('menu-left').classList.add('show');
-    document.getElementById('menu-right').classList.add('show');    
-    
-  } catch(e) {
-    setStatus('Camera access denied — please allow permissions and reload.');
-    started=false;
-  }
+  document.getElementById('canvas-wrap').style.display='block';
+  document.getElementById('info').style.display='block';
+  document.getElementById('rec-panel').style.display='flex';
+  document.getElementById('hint').style.display='block';
+  document.getElementById('pitch-strip').style.display='flex';document.getElementById('menu-left').classList.add('show');document.getElementById('menu-right').classList.add('show');
 });
 
 const menuLeftTitle = document.getElementById("menu-left-title");
@@ -920,10 +888,90 @@ const menuRight = document.getElementById("menu-right");
 
 menuLeftTitle.addEventListener("click", () => {
     menuLeft.classList.toggle("show");
+    menuLeftTitle.classList.toggle("clicked");
+    if (menuLeftTitle.classList.contains("clicked")){
+        menuLeftTitle.innerHTML = "LEFT HAND ×";
+    } else {
+        menuLeftTitle.innerHTML = "LEFT HAND ↓";
+    };
+    if (searchLeft.classList.contains("show")){
+        searchLeft.classList.remove("show");
+        searchLeftBtn.classList.toggle("close");
+        if (searchLeftBtn.classList.contains("close")) {
+            searchLeftBtn.innerHTML = "×";
+        } else{
+        searchLeftBtn.innerHTML = "+";
+    }
+    } else;
+    if (window.innerWidth <= 800) {
+        if (menuLeftTitle.classList.contains("clicked")){
+            menuLeftTitle.innerHTML = "×";
+        } else {
+            menuLeftTitle.innerHTML = "L";
+        };
+        if (menuRightTitle.classList.contains("clicked")){
+            menuRightTitle.classList.remove("clicked");
+            menuRight.classList.toggle("show");
+            if (menuRightTitle.classList.contains("clicked")) {
+                menuRightTitle.innerHTML = "×";
+            } else {
+            menuRightTitle.innerHTML = "R"; 
+            };
+        } else;
+        if (searchRight.classList.contains("show")){
+            searchRight.classList.remove("show");
+            searchRightBtn.classList.toggle("close");
+            if (searchRightBtn.classList.contains("close")) {
+                searchRightBtn.innerHTML = "×";
+            } else{
+            searchRightBtn.innerHTML = "+";
+            }
+        } else;    
+    } else;
 });
 
 menuRightTitle.addEventListener("click", () => {
     menuRight.classList.toggle("show");
+    menuRightTitle.classList.toggle("clicked");
+    if (menuRightTitle.classList.contains("clicked")){
+        menuRightTitle.innerHTML = "× RIGHT HAND";
+    } else {
+        menuRightTitle.innerHTML = "↓ RIGHT HAND";
+    };
+    if (searchRight.classList.contains("show")){
+        searchRight.classList.remove("show");
+        searchRightBtn.classList.toggle("close");
+        if (searchRightBtn.classList.contains("close")) {
+            searchRightBtn.innerHTML = "×";
+        } else{
+        searchRightBtn.innerHTML = "+";
+        }
+    } else;
+    if (window.innerWidth <= 800) {
+        if (menuRightTitle.classList.contains("clicked")){
+            menuRightTitle.innerHTML = "×";
+        } else {
+            menuRightTitle.innerHTML = "R";
+        };
+        if (menuLeftTitle.classList.contains("clicked")){
+            menuLeftTitle.classList.remove("clicked");
+            menuLeft.classList.toggle("show");
+            if (menuLeftTitle.classList.contains("clicked")) {
+                menuLeftTitle.innerHTML = "×";
+            } else {
+                menuLeftTitle.innerHTML = "L"; 
+            };
+        } else;
+        if (searchLeft.classList.contains("show")){
+            searchLeft.classList.remove("show");
+            searchLeftBtn.classList.toggle("close");
+            if (searchLeftBtn.classList.contains("close")) {
+                searchLeftBtn.innerHTML = "×";
+            } else{
+            searchLeftBtn.innerHTML = "+";
+            }
+        } else;
+    };
 });
 
 let activeMenuSide = 'left'; // default
@@ -950,7 +998,7 @@ menuLeftTitle.addEventListener('click', () => { activeMenuSide = 'left'; });
 menuRightTitle.addEventListener('click', () => { activeMenuSide = 'right'; });
 
 function updateMenuLabels() {
-  if (window.innerWidth <= 600) {
+  if (window.innerWidth <= 800) {
     document.getElementById('menu-left-title').innerHTML = 'L';
     document.getElementById('menu-right-title').innerHTML = 'R';
   } else {
@@ -999,4 +1047,232 @@ function buildMenus() {
     // ADD THIS — show inner once populated
     inner.classList.add('show');
   });
-}
+};
+
+let searchLeftBtn = document.getElementById('search-toggle-left');
+let searchRightBtn = document.getElementById('search-toggle-right');
+let searchLeft = document.getElementById('search-left');
+let searchRight = document.getElementById('search-right');
+
+searchLeftBtn.addEventListener("click", ()=> {
+    searchLeft.classList.toggle("show");
+    searchLeftBtn.classList.toggle("close");
+    if (searchLeftBtn.classList.contains("close")) {
+        searchLeftBtn.innerHTML = "×";
+    } else{
+       searchLeftBtn.innerHTML = "+";
+    };
+    if (menuLeftTitle.classList.contains("clicked")){
+        menuLeftTitle.classList.remove("clicked");
+        menuLeft.classList.toggle("show");
+        if (menuLeftTitle.classList.contains("clicked")) {
+            menuLeftTitle.innerHTML = "LEFT HAND ↓";
+        } else {
+           menuLeftTitle.innerHTML = "LEFT HAND ↓"; 
+        };
+    } else;
+    if (window.innerWidth <= 800) {
+        if (menuLeftTitle.classList.contains("clicked")){
+            menuLeftTitle.innerHTML = "×";
+        } else {
+            menuLeftTitle.innerHTML = "L";
+        };
+        if (searchRight.classList.contains("show")){
+            searchRight.classList.remove("show");
+            searchRightBtn.classList.toggle("close");
+            if (searchRightBtn.classList.contains("close")) {
+                searchRightBtn.innerHTML = "×";
+            } else{
+            searchRightBtn.innerHTML = "+";
+            }
+        } else;
+        if (menuRightTitle.classList.contains("clicked")){
+            menuRightTitle.classList.remove("clicked");
+            menuRight.classList.toggle("show");
+            if (menuRightTitle.classList.contains("clicked")) {
+                menuRightTitle.innerHTML = "×";
+            } else {
+                menuRightTitle.innerHTML = "R"; 
+            };
+        } else;
+    };
+});
+searchRightBtn.addEventListener("click", ()=> {
+    searchRight.classList.toggle("show");
+    searchRightBtn.classList.toggle("close");
+    if (searchRightBtn.classList.contains("close")) {
+        searchRightBtn.innerHTML = "×";
+    } else{
+       searchRightBtn.innerHTML = "+";
+    };
+    if (menuRightTitle.classList.contains("clicked")){
+        menuRightTitle.classList.remove("clicked");
+        menuRight.classList.toggle("show");
+        if (menuRightTitle.classList.contains("clicked")) {
+            menuRightTitle.innerHTML = "↓ RIGHT HAND";
+        } else {
+           menuRightTitle.innerHTML = "↓ RIGHT HAND"; 
+        };
+    } else;
+    if (window.innerWidth <= 800) {
+        if (menuRightTitle.classList.contains("clicked")){
+            menuRightTitle.innerHTML = "×";
+        } else {
+            menuRightTitle.innerHTML = "R";
+        };
+        if (searchLeft.classList.contains("show")){
+            searchLeft.classList.remove("show");
+            searchLeftBtn.classList.toggle("close");
+            if (searchLeftBtn.classList.contains("close")) {
+                ssearchLeftBtn.innerHTML = "×";
+            } else{
+            searchLeftBtn.innerHTML = "+";
+            }
+        } else;
+        if (menuLeftTitle.classList.contains("clicked")){
+            menuLeftTitle.classList.remove("clicked");
+            menuLeft.classList.toggle("show");
+            if (menuLeftTitle.classList.contains("clicked")) {
+                menuLeftTitle.innerHTML = "×";
+            } else {
+                menuLeftTitle.innerHTML = "L"; 
+            };
+        } else;
+    };
+});
+
+['left', 'right'].forEach(side => {
+  const input   = document.getElementById(`search-input-${side}`);
+  const btn     = document.getElementById(`search-btn-${side}`);
+  const results = document.getElementById(`search-results-${side}`);
+
+  async function doSearch() {
+    const q = input.value.trim();
+    if (!q) return;
+    results.innerHTML = '<div style="font-size:10px;color:var(--muted);padding:6px 10px">searching…</div>';
+
+    try {
+      const params = new URLSearchParams({
+        query: q,
+        page_size: 20,
+        filter: `duration:[${MIN_DUR} TO ${MAX_DUR}]`,
+        fields: 'id,name,tags,previews',
+        token: API_KEY,
+      });
+      const res  = await fetch(`https://freesound.org/apiv2/search/text/?${params}`);
+      const data = await res.json();
+      const hits = (data.results || []).map(s => ({
+        id: s.id,
+        name: s.name.replace(/\.[^.]+$/, '').slice(0, 48),
+        tags: (s.tags || []).slice(0, 5).join(' · '),
+        previewUrl: s.previews?.['preview-lq-mp3'] || s.previews?.['preview-hq-mp3'],
+      })).filter(s => s.previewUrl);
+
+      results.innerHTML = '';
+      if (!hits.length) {
+        results.innerHTML = '<div style="font-size:10px;color:var(--muted);padding:6px 10px">no results</div>';
+        return;
+      }
+
+      hits.forEach(sound => {
+        const el = document.createElement('div');
+        el.className = 'search-result-item';
+        el.textContent = sound.name;
+        el.addEventListener('click', () => {
+          // Mark as active
+          results.querySelectorAll('.search-result-item').forEach(i => i.classList.remove('active'));
+          el.classList.add('active');
+          // Load directly into this hand — bypasses soundPool entirely
+          loadSound(side, sound);
+        });
+        results.appendChild(el);
+      });
+    } catch(e) {
+      results.innerHTML = '<div style="font-size:10px;color:var(--muted);padding:6px 10px">error</div>';
+    }
+  }
+
+  btn.addEventListener('click', doSearch);
+  input.addEventListener('keydown', e => { if (e.key === 'Enter') doSearch(); });
+});
+
+
+const pitchVolHL = document.querySelectorAll(".pitch-vol-highlight");
+const soundMenuHL = document.querySelectorAll(".sound-menu-highlight");
+const moreSoundsHL = document.querySelectorAll(".more-sounds-highlight");
+const recordHL = document.querySelectorAll(".record-highlight");
+const mixHL = document.querySelectorAll(".mix-highlight");
+
+let tutorialClose = document.getElementById("tut-no");
+tutorialClose.addEventListener("click", ()=> {
+    instruction.classList.remove("show");    
+});
+
+let startTutorial = document.getElementById("tut-yes");
+function tutorial(){
+    instruction.innerHTML = "Hold up both hands";
+    
+    const check = setInterval(() => {
+        if (seenLeft && seenRight) {
+            clearInterval(check);
+            // move to next step
+            instruction.innerHTML = 
+            "Great!<br>Now try changing pitch/volume (the numbers change in the cards)- <br><br>• Fingers farther/closer apart for volume up/down<br>• Hands up/down for pitch up/down <div id='next-soundmenu' class='next-btn'>NEXT</div>";
+            pitchVolHL.forEach(el => el.classList.add("show"));
+            nextSoundMenu = document.getElementById('next-soundmenu');
+            nextSoundMenu.addEventListener('click', ()=> {
+                instruction.innerHTML =
+                "You can select from 30 sounds with the sound menus <div id='next-moresounds' class='next-btn'>NEXT</div>";
+                pitchVolHL.forEach(el => el.classList.remove("show"));
+                soundMenuHL.forEach(el => el.classList.add("show"));
+                nextMoreSounds = document.getElementById('next-moresounds');
+                nextMoreSounds.addEventListener('click', ()=>{
+                    instruction.innerHTML =
+                    "Or use any sound from Freesounds<div id='next-record' class='next-btn'>NEXT</div>";
+                    soundMenuHL.forEach(el => el.classList.remove("show"));
+                    moreSoundsHL.forEach(el => el.classList.add("show"));
+                    nextRecord = document.getElementById('next-record');
+                    nextRecord.addEventListener('click', ()=> {
+                        instruction.innerHTML =
+                        "Record your soundscape to save/download <div id='next-layermix' class='next-btn'>NEXT</div>";
+                        moreSoundsHL.forEach(el => el.classList.remove("show"));
+                        recordHL.forEach(el => el.classList.add("show"));
+                        nextLayerMix = document.getElementById('next-layermix');
+                        nextLayerMix.addEventListener('click', ()=>{
+                            instruction.innerHTML =
+                            "When you have multiple layers, generate a mix + download<div id='next-final' class='next-btn'>GOT IT!</div>";
+                            recordHL.forEach(el => el.classList.remove("show"));
+                            mixHL.forEach(el => el.classList.add("show"));
+                            nextFinal = document.getElementById('next-final');
+                            nextFinal.addEventListener('click', ()=>{
+                                instruction.innerHTML =
+                                "<div id='end-tutorial' class='next-btn'>I'm ready to start :D</div><div id='restart-tutorial' class='next-btn'>Restart Tutorial</div>";
+                                mixHL.forEach(el => el.classList.remove("show"));
+                                endTutorial = document.getElementById('end-tutorial');
+                                endTutorial.addEventListener("click", ()=>{
+                                    instruction.classList.remove("show"); 
+                                });
+                                restartTutorial = document.getElementById('restart-tutorial');
+                                restartTutorial.addEventListener("click", ()=>{
+                                    instruction.innerHTML = 
+                                    "START TUTORIAL<div id='tut-confirm'><div id='tut-yes'>YES</div><div id='tut-no'>CLOSE</div></div>";
+                                    document.getElementById("tut-no").addEventListener("click", ()=> {
+                                        instruction.classList.remove("show");    
+                                    });
+                                    document.getElementById("tut-yes").addEventListener("click", tutorial);
+                                });
+                            });
+                        });
+                    });
+                });
+                   
+            });
+        }
+    }, 200);
+    
+};
+startTutorial.addEventListener("click", tutorial);
+
+
+
+

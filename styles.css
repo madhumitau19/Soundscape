@@ -966,7 +966,7 @@
         border: solid 3px var(--rec);
         border-radius: 20px;
         width: 102.97px;
-        height: 38px !important;
+        height: 35px !important;
         left: 5%;
         display: none;
     }
@@ -974,7 +974,7 @@
     .mix-highlight{
         position: fixed;
         width: 192.16px;
-        height: 40px !important; 
+        height: 50px !important; 
         left: calc(50% - 101px);
         top: 368.5px;
         pointer-events: none;

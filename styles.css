@@ -910,7 +910,7 @@
         border: solid 3px var(--rec);
         border-radius: 100px;
         position: fixed;
-        top: 150px;
+        top: 10px;
         pointer-events: none;
         z-index: 1000;
         display: none;

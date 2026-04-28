@@ -3,7 +3,7 @@ let seenRight = false;
 // ═══════════════════════════════════════════════════════════════════
 //  CONFIG
 // ═══════════════════════════════════════════════════════════════════
-let API_KEY = '7qRv74PMMNRaruCgFKr6hK3YdzJbOIwub0vPMPqv';
+let API_KEY = 'QS2RhtQ36g5610XwRAg5VmpioGgUfaSb1ZcyzFdV';
 const POOL_SIZE = 20, MIN_DUR = 3, MAX_DUR = 120;
 
 // ═══════════════════════════════════════════════════════════════════
@@ -14,34 +14,224 @@ let soundPool = [];
 
 const SEARCH_QUERIES = ['ambient','field recording','texture','drone','nature loop','atmosphere','soundscape'];
 
-async function fetchPool() {
-  setStatus('Loading sounds…');
+// async function fetchPool() {
+//   setStatus('Loading sounds…');
   
-  const SOUND_IDS = [
-    846079, 389773, 218551, 582359, 849847, 851238, 851157, 849437, 851581, 851168, 851170, 844138, 842746, 850840, 848608, 851085, 850883, 851337, 851268, 850502, 850414, 848395, 830144, 847437, 846508, 846032, 843183, 844922, 847180, 849806
-  ];
+//   const SOUND_IDS = [
+//     846079, 389773, 218551, 582359, 849847, 851238, 851157, 849437, 851581, 851168, 851170, 844138, 842746, 850840, 848608, 851085, 850883, 851337, 851268, 850502, 850414, 848395, 830144, 847437, 846508, 846032, 843183, 844922, 847180, 849806
+//   ];
 
-  try {
-    const results = await Promise.all(SOUND_IDS.map(async id => {
-      const res = await fetch(`https://freesound.org/apiv2/sounds/${id}/?fields=id,name,tags,previews&token=${API_KEY}`);
-      if (!res.ok) return null;
-      const s = await res.json();
-      return {
-        id: s.id,
-        name: s.name.replace(/\.[^.]+$/, '').slice(0, 48),
-        tags: (s.tags || []).slice(0, 5).join(' · '),
-        previewUrl: s.previews?.['preview-lq-mp3'] || s.previews?.['preview-hq-mp3'],
-      };
-    }));
+//   try {
+//     const results = await Promise.all(SOUND_IDS.map(async id => {
+//       const res = await fetch(`https://freesound.org/apiv2/sounds/${id}/?fields=id,name,tags,previews&token=${API_KEY}`);
+//       if (!res.ok) return null;
+//       const s = await res.json();
+//       return {
+//         id: s.id,
+//         name: s.name.replace(/\.[^.]+$/, '').slice(0, 48),
+//         tags: (s.tags || []).slice(0, 5).join(' · '),
+//         previewUrl: s.previews?.['preview-lq-mp3'] || s.previews?.['preview-hq-mp3'],
+//       };
+//     }));
 
-    soundPool = results.filter(s => s && s.previewUrl);
-    if (!soundPool.length) throw new Error('No results');
-    dbg(`Pool: ${soundPool.length} sounds (curated)`);
-    buildMenus();
-  } catch(e) {
-    dbg('fetchPool error: ' + e.message);
-    setStatus('Could not load sounds — check IDs or API key');
+//     soundPool = results.filter(s => s && s.previewUrl);
+//     if (!soundPool.length) throw new Error('No results');
+//     dbg(`Pool: ${soundPool.length} sounds (curated)`);
+//     buildMenus();
+//   } catch(e) {
+//     dbg('fetchPool error: ' + e.message);
+//     setStatus('Could not load sounds — check IDs or API key');
+//   }
+//   setStatus('');
+// }
+
+const SOUND_POOL_DATA = 
+[{
+    "id": 846079,
+    "name": "AtmosphericHorrorAmbience15",
+    "tags": "ambience · ambient-sound · atmospheric · background · background-loop",
+    "previewUrl": "https://cdn.freesound.org/previews/846/846079_17278148-lq.mp3"
+  },
+  {
+    "id": 389773,
+    "name": "Darkness Cinematic 160 bpm",
+    "tags": "Ambience · Ambient · Atmosphere · Atmospheric · Cinematic",
+    "previewUrl": "https://cdn.freesound.org/previews/389/389773_4448255-lq.mp3"
+  },
+  {
+    "id": 218551,
+    "name": "Snoring Cello",
+    "tags": "130 · 130-bpm · ambience · atmosphere · dreamy",
+    "previewUrl": "https://cdn.freesound.org/previews/218/218551_468390-lq.mp3"
+  },
+  {
+    "id": 582359,
+    "name": "Birds mixed sound",
+    "tags": "Birds · blackbird · chaffinch · natural-sound · tit",
+    "previewUrl": "https://cdn.freesound.org/previews/582/582359_10547404-lq.mp3"
+  },
+  {
+    "id": 849847,
+    "name": "WATRFlow_FLOW Stream with Gentle Cityscape in Ba",
+    "tags": "ambience · field-recording · park · public",
+    "previewUrl": "https://cdn.freesound.org/previews/849/849847_18160342-lq.mp3"
+  },
+  {
+    "id": 851238,
+    "name": "Mechanical FX in Deep Cavern",
+    "tags": "FX · alien · cavern · dark · deep",
+    "previewUrl": "https://cdn.freesound.org/previews/851/851238_2520418-lq.mp3"
+  },
+  {
+    "id": 851157,
+    "name": "nice retro sound a",
+    "tags": "audio · digital · ether · ether-audio · etheraudio",
+    "previewUrl": "https://cdn.freesound.org/previews/851/851157_16155788-lq.mp3"
+  },
+  {
+    "id": 849437,
+    "name": "MUSCSmpl_Crystal Box Lush And Rosin Drone Pad 2-",
+    "tags": "bed · cristal · drone · frosen · glass",
+    "previewUrl": "https://cdn.freesound.org/previews/849/849437_5828667-lq.mp3"
+  },
+  {
+    "id": 851581,
+    "name": "Guitambient",
+    "tags": "Ambient · Drone · Guitar · Soundscape · a-minor",
+    "previewUrl": "https://cdn.freesound.org/previews/851/851581_462105-lq.mp3"
+  },
+  {
+    "id": 851168,
+    "name": "One Shot Bright Ambient Synth",
+    "tags": "bright · one-shot · reverb · synth",
+    "previewUrl": "https://cdn.freesound.org/previews/851/851168_15636277-lq.mp3"
+  },
+  {
+    "id": 851170,
+    "name": "Alien Crypted FM Phone Communication Texture",
+    "tags": "FM · alien · background · communication · cripted",
+    "previewUrl": "https://cdn.freesound.org/previews/851/851170_15636277-lq.mp3"
+  },
+  {
+    "id": 844138,
+    "name": "Soft piano tinkles delay",
+    "tags": "delay · dissonant · effected · hard · instrument",
+    "previewUrl": "https://cdn.freesound.org/previews/844/844138_2309965-lq.mp3"
+  },
+  {
+    "id": 842746,
+    "name": "Rhodes piano halftime 58",
+    "tags": "effects · keyboard · piano · rhodes",
+    "previewUrl": "https://cdn.freesound.org/previews/842/842746_9497060-lq.mp3"
+  },
+  {
+    "id": 850840,
+    "name": "Church Vocal warm-up - dual mono - Dji mic3",
+    "tags": "Church · Dji · Dji-Mic-3 · Dji-Mic3 · Dual-mono",
+    "previewUrl": "https://cdn.freesound.org/previews/850/850840_5287430-lq.mp3"
+  },
+  {
+    "id": 848608,
+    "name": "So, what do you see in your daydreams?",
+    "tags": "dream · ethereal · nonbinary · speech · talking",
+    "previewUrl": "https://cdn.freesound.org/previews/848/848608_14696146-lq.mp3"
+  },
+  {
+    "id": 851085,
+    "name": "Alien Drone with FM modulation and Granulary Syn",
+    "tags": "FM · alien · drone · granular · sci-fi",
+    "previewUrl": "https://cdn.freesound.org/previews/851/851085_15636277-lq.mp3"
+  },
+  {
+    "id": 850883,
+    "name": "Plasma Energy Movement FX",
+    "tags": "FX · abstract · alien · craft · effect",
+    "previewUrl": "https://cdn.freesound.org/previews/850/850883_2520418-lq.mp3"
+  },
+  {
+    "id": 851337,
+    "name": "street organ pensmarkt s-Hertogenbosch Netherlan",
+    "tags": "Den-Bosch · Dutch · Holland · Netherlands · Street",
+    "previewUrl": "https://cdn.freesound.org/previews/851/851337_1648170-lq.mp3"
+  },
+  {
+    "id": 851268,
+    "name": "Sleep in car.",
+    "tags": "cars · city · noise · people · road",
+    "previewUrl": "https://cdn.freesound.org/previews/851/851268_17675683-lq.mp3"
+  },
+  {
+    "id": 850502,
+    "name": "Vintage 16mm Film Static Optical Sound - normal ",
+    "tags": "16mm · analog · celluloid · cinema · clear-leader",
+    "previewUrl": "https://cdn.freesound.org/previews/850/850502_14865205-lq.mp3"
+  },
+  {
+    "id": 850414,
+    "name": "WIND_Winter.Evening In The Yard.Wind In The Tree",
+    "tags": "ambiance · ambience · ambient · atmo · atmos",
+    "previewUrl": "https://cdn.freesound.org/previews/850/850414_5828667-lq.mp3"
+  },
+  {
+    "id": 848395,
+    "name": "eldritch rumbles -120 bpm",
+    "tags": "120bpm · ambient · atmosphere · electronic · horror",
+    "previewUrl": "https://cdn.freesound.org/previews/848/848395_8645255-lq.mp3"
+  },
+  {
+    "id": 830144,
+    "name": "Meditative Ethno Spa (After Hours Loopable Edit)",
+    "tags": "Calming · Loopable · Nature · Rain · Relaxing",
+    "previewUrl": "https://cdn.freesound.org/previews/830/830144_13915946-lq.mp3"
+  },
+  {
+    "id": 847437,
+    "name": "Accours RC300 vx - 2",
+    "tags": "choir · choral · male-voices · music · singing",
+    "previewUrl": "https://cdn.freesound.org/previews/847/847437_11653850-lq.mp3"
+  },
+  {
+    "id": 846508,
+    "name": "F#4 Minor Pad",
+    "tags": "Chord · Chordpad · Pad",
+    "previewUrl": "https://cdn.freesound.org/previews/846/846508_5876986-lq.mp3"
+  },
+  {
+    "id": 846032,
+    "name": "finger exercises on pipe organ 0934 am 250223_10",
+    "tags": "ambience · ambient · atmosphere · calm · church",
+    "previewUrl": "https://cdn.freesound.org/previews/846/846032_1648170-lq.mp3"
+  },
+  {
+    "id": 843183,
+    "name": "Simple Majestic Choir Melody (C minor, ~95 BPM)",
+    "tags": "95BPM · Choir · Cm · Epic · Magestic",
+    "previewUrl": "https://cdn.freesound.org/previews/843/843183_7023195-lq.mp3"
+  },
+  {
+    "id": 844922,
+    "name": "Pad (Colorbass) - Bliss In Glitches 02",
+    "tags": "Colorbass · Glitches · Glitchy · Pad · Synth",
+    "previewUrl": "https://cdn.freesound.org/previews/844/844922_15956618-lq.mp3"
+  },
+  {
+    "id": 847180,
+    "name": "Metal Bars",
+    "tags": "Bars · Metal · Pattern",
+    "previewUrl": "https://cdn.freesound.org/previews/847/847180_15839257-lq.mp3"
+  },
+  {
+    "id": 849806,
+    "name": "Channeling Magic Texture",
+    "tags": "ambient · aura · bright · channel · chime",
+    "previewUrl": "https://cdn.freesound.org/previews/849/849806_18554592-lq.mp3"
   }
+];
+
+async function fetchPool() {
+  soundPool = SOUND_POOL_DATA.filter(s => s && s.previewUrl);
+  dbg(`Pool: ${soundPool.length} sounds (hardcoded)`);
+  buildMenus();
   setStatus('');
 }
 

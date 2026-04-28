@@ -16,7 +16,7 @@
   body {
     background:var(--bg); color:var(--text);
     font-family:'Inconsolata',monospace;
-    min-height:100vh; display:flex; flex-direction:column; align-items:center;
+    min-height:100dvh; display:flex; flex-direction:column; align-items:center;
     overflow-x:hidden;
   }
 
@@ -101,7 +101,6 @@
   #start-btn::before,#start-btn::after { content:''; position:absolute; width:7px; height:7px;  }
   #start-btn::before { top:-1px; left:-1px; border-width:1px 0 0 1px; }
   #start-btn::after  { bottom:-1px; right:-1px; border-width:0 1px 1px 0; }
-  #start-btn:hover { background: var(--bord); color: var(--bg); border-color: var(--bord); cursor: pointer;}
   #status { font-size:11px; letter-spacing:0.1em; color:var(--muted); text-align:center; min-height:16px; display: none}
 
   
@@ -113,7 +112,7 @@
     position: fixed;
     left: 25%;
     top: 60px;
-    max-height: 80vh;
+    max-height: 80dvh;
     /* background-color: red;  */
     gap:12px;
     overflow: hidden; 
@@ -185,15 +184,15 @@
     border-color:var(--rec); 
     color:var(--rec); 
     border-radius: 30px;
-    }
-  #btn-record:hover:not(:disabled) { background-color: var(--rec); color: var(--bg) }
+    }  
+ 
   #btn-record.recording { background:rgba(226,75,74,0.15); }
 
   #btn-stop { 
     border-color:var(--bord); 
     border-radius: 16px;
     }
-  #btn-stop:hover:not(:disabled) {background-color: var(--bord); color: var(--bg) }
+  
 
   /* Layers list */
   #layers-wrap { width:100%; display:flex; flex-direction:column; gap:10px; margin-top: 20px;}
@@ -209,7 +208,7 @@
     flex-direction:column; 
     gap:10px; 
     width:100%;
-    max-height: 41vh;
+    max-height: 41dvh;
     overflow-y: scroll;  
     }
 
@@ -239,9 +238,9 @@
     transition:border-color 0.15s,color 0.15s,background 0.15s; white-space:nowrap;
     border-radius: 30px;
   }
-  .layer-btn:hover { border-color:var(--bord); color:var(--bg); background-color: var(--bord)}
+  
   .layer-btn.muted { color:var(--rec); border-color:rgba(226,75,74,0.4); }
-  .layer-btn.delete:hover { border-color:var(--rec); color:var(--bg); background-color: var(--rec);}
+  
 
   .layer-vol-wrap { width:60px; height:2px; background:rgba(255,255,255,0.08); position:relative; cursor:pointer; padding:6px 0; margin:-6px 0; }
   .layer-vol-fill { height:2px; background:var(--left); pointer-events:none; }
@@ -249,7 +248,6 @@
   /* Export row */
   #export-row { display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
   .btn-export { padding:10px 20px; font-family:'Inconsolata',monospace; font-size:11px; letter-spacing:0.15em; text-transform:uppercase; background:transparent; color:var(--muted); border:1px solid var(--bord); cursor:pointer; transition:border-color 0.15s,color 0.15s,background 0.15s; border-radius: 30px;}
-  .btn-export:hover:not(:disabled) { background-color: var(--bord); color: var(--bg) ; }
   .btn-export:disabled { opacity:0.3; cursor:default; }
 
   #hint { text-align:center; font-size:10px; letter-spacing:0.14em; text-transform:uppercase; color:var(--muted); line-height:1.9; display:none; }
@@ -293,7 +291,7 @@
     top: 60px;
     width: 15vw;
     z-index: 5;
-    height: 92vh;
+    height: 92dvh;
     display: none;
     flex-direction: column;
     overflow: hidden; /* clip the scroll */
@@ -337,10 +335,7 @@
     display: block;
     transition: all 0.2s ease-in-out;
   }
-  #menu-left-title:hover{
-    background-color: var(--left);
-    color: var(--bg);
-  }
+  
   #menu-left-title.clicked{
     background-color: var(--bg);
     color: var(--left);
@@ -366,10 +361,7 @@
     display: block;
     transition: all 0.2s ease-in-out;
   }
-  #menu-right-title:hover{
-    background-color: var(--right);
-    color: var(--bg);
-  }
+  
   #menu-right-title.clicked{
     background-color: var(--bg);
     color: var(--right);
@@ -423,12 +415,7 @@
     background-color: var(--left);
     border-radius: 20px;  
     }
-    .sound-menu.left  .menu-item:hover { 
-        color: var(--left);   
-        /* background-color: var(--left); */
-        border: none;
-        border-radius: 20px;  
-    }
+    
     .sound-menu.left  .menu-item:active { 
         color: var(--bg);   
         /* background-color: var(--left); */
@@ -440,13 +427,7 @@
     background: var(--right);
     border-radius: 20px;
     }
-    .sound-menu.right  .menu-item:hover { 
-        color: var(--right);   
-        /* background-color: var(--left); */
-        /* border: solid 1px var(--right); */
-        border-radius: 20px;  
-        border: none;
-    }
+    
     .sound-menu.right  .menu-item:active { 
         color: var(--bg);   
         /* background-color: var(--left); */
@@ -454,24 +435,6 @@
         border-radius: 20px;  
         border: none;
     }
-  /* .sound-menu.left .menu-item.cursor {
-    background: #d26a2556;
-    border-radius: 2px 30px 30px 2px
-  } */
-  /* .sound-menu.scrolling-down .menu-item.cursor,
-  .sound-menu.scrolling-up   .menu-item.cursor {
-    animation: cursorPulse 0.35s ease-out;
-  } */
-  /* .sound-menu.left.scrolling-down  .menu-item.cursor,
-  .sound-menu.left.scrolling-up    .menu-item.cursor { background: rgba(155,143,232,0.2); color: var(--left); }
-  .sound-menu.right.scrolling-down .menu-item.cursor,
-  .sound-menu.right.scrolling-up   .menu-item.cursor { background: rgba(93,202,165,0.2);  color: var(--right); }
-  @keyframes cursorPulse {
-    0%   { opacity:1; }
-    50%  { opacity:0.5; }
-    100% { opacity:1; }
-  } */
-  /* Gesture state badge drawn on the canvas – also show a small overlay badge */
   .gesture-badge {
     position:absolute; bottom:32px; font-size:22px; pointer-events:none;
     filter: drop-shadow(0 0 6px rgba(255,255,255,0.4));
@@ -526,11 +489,7 @@
     cursor: pointer;
     transition: all 0.2s ease-in-out;
   }
-  #tut-yes:hover, #tut-no:hover{
-    color: var(--bg);
-    background-color: var(--bord);
-    cursor: pointer;
-  }
+  
 
   #instruction-button{
     position: fixed;
@@ -549,10 +508,7 @@
     justify-content: center;
     transition: all 0.2s ease-in-out;
   }
-  #instruction-button:hover{
-    background-color: var(--bord);
-    color: var(--bg);
-  }
+  
 
   #instruction-button.show{
     display: flex;
@@ -565,10 +521,7 @@
     border: solid 1px var(--bord);
     transition: all 0.2s ease-in-out;
   }
-  .next-btn:hover{
-    background-color: var(--bord);
-    color: var(--bg);
-  }
+ 
   #end-tutorial{
     margin-top: 0;
   }
@@ -580,14 +533,6 @@
     border-radius: 100px;
     /* display: none; */
     transition: all 0.1s ease-in-out;
-  }
-  #search-toggle-left:hover {
-    background-color: var(--left);
-    color: var(--bg);
-  }
-  #search-toggle-right:hover {
-    background-color: var(--right);
-    color: var(--bg);
   }
 
   #search-toggle-left{
@@ -631,12 +576,7 @@
     color: var(--bg);
     padding: 4px 12px;
   }
-  #search-results-left .search-result-item:hover{
-    color: var(--left);
-  }
-   #search-results-right .search-result-item:hover{
-    color: var(--right);
-  }
+  
   .search-window-header{
     /* text-transform: uppercase; */
     font-size: 10px;
@@ -652,7 +592,7 @@
 
   .search-window{
     width: 208px;
-    height: 89.5vh;
+    height: 89.5dvh;
     padding: 20px;
     border-radius: 32px;
     background-color: var(--bg);
@@ -804,6 +744,67 @@
   }
 
 
+@media (hover: hover) {
+     #start-btn:hover { background: var(--bord); color: var(--bg); border-color: var(--bord); cursor: pointer;}
+     #btn-record:hover:not(:disabled) { background-color: var(--rec); color: var(--bg) }
+     #btn-stop:hover:not(:disabled) {background-color: var(--bord); color: var(--bg)}
+     .layer-btn:hover { border-color:var(--bord); color:var(--bg); background-color: var(--bord)}
+     .layer-btn.delete:hover { border-color:var(--rec); color:var(--bg); background-color: var(--rec);}
+     .btn-export:hover:not(:disabled) { background-color: var(--bord); color: var(--bg) ; }
+     #menu-left-title:hover{
+        background-color: var(--left);
+        color: var(--bg);
+    }
+     #menu-right-title:hover{
+        background-color: var(--right);
+        color: var(--bg);
+    }
+     .sound-menu.left  .menu-item:hover { 
+        color: var(--left);   
+        /* background-color: var(--left); */
+        border: none;
+        border-radius: 20px;  
+    }
+    .sound-menu.right  .menu-item:hover { 
+        color: var(--right);   
+        /* background-color: var(--left); */
+        /* border: solid 1px var(--right); */
+        border-radius: 20px;  
+        border: none;
+    }
+    #tut-yes:hover, #tut-no:hover{
+        color: var(--bg);
+        background-color: var(--bord);
+        cursor: pointer;
+    } 
+     #instruction-button:hover{
+        background-color: var(--bord);
+        color: var(--bg);
+    }
+     .next-btn:hover{
+        background-color: var(--bord);
+        color: var(--bg);
+    }
+     #search-toggle-left:hover {
+        background-color: var(--left);
+        color: var(--bg);
+    }
+     #search-toggle-right:hover {
+        background-color: var(--right);
+        color: var(--bg);
+    }
+     #search-results-left .search-result-item:hover{
+        color: var(--left);
+    }
+   #search-results-right .search-result-item:hover{
+        color: var(--right);
+    }
+    
+}
+
+
+
+
 @media screen and (max-width: 800px) {
     /* *:hover{
         all: unset;
@@ -881,12 +882,34 @@
         width: 100%;
     }
 
+    #instruction{
+        width: 300px;
+        height: 150px;
+        border: solid var(--bord) 1px;
+        /* background-color: var(--bg); */
+        position: fixed;
+        /* top: calc(50vh - 125px); */
+        bottom: 80px;
+        left: calc(50vw - 150px);
+        z-index: 100;
+        border-radius: 50px;
+        display: none;
+        backdrop-filter:blur(4px);
+        text-align: center;
+        padding: 20px;
+        font-size: 13px; 
+    }
+    .next-btn{
+        margin-top: 10px;
+        padding: 5px 30px;
+    }
+
     .sound-menu-highlight{
         height: 38.5px;
         border: solid 3px var(--rec);
         border-radius: 100px;
         position: fixed;
-        top: 10px;
+        top: 9px;
         pointer-events: none;
         z-index: 1000;
         display: none;
@@ -906,7 +929,7 @@
         border: solid 3px var(--rec);
         border-radius: 100px;
         position: fixed;
-        top: 10px;
+        top: 9px;
         pointer-events: none;
         z-index: 1000;
         display: none;
@@ -921,7 +944,7 @@
     .pitch-vol-highlight{
         font-size: 30px;
         position: fixed;
-        top: 131px;
+        top: 130px;
         pointer-events: none;
         z-index: 1000;
         color: var(--rec);
@@ -936,7 +959,7 @@
 
     .record-highlight{
         position: fixed;
-        top: 230px;
+        top: 229px;
         pointer-events: none;
         z-index: 1000px;
         border: solid 3px var(--rec);
@@ -952,7 +975,7 @@
         width: 192.16px;
         height: 33.5px;
         left: calc(50% - 101px);
-        top: 368.5px;
+        top: 367.5px;
         pointer-events: none;
         z-index: 1000px;
         border: solid 3px var(--rec);

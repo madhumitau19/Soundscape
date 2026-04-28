@@ -728,16 +728,14 @@
   }
 
   .mix-highlight{
+    font-size: 30px;
     position: fixed;
-    width: 192.16px;
-    height: 33.5px;
-    left: 25%;
-    top: 368.5px;
     pointer-events: none;
     z-index: 1000;
-    border: solid 3px var(--rec);
-    border-radius: 20px;
+    color: var(--rec);
     display: none;
+    top: 365px;
+    left: 20%;
   }
 
   .pitch-vol-highlight.show, .sound-menu-highlight.show, .more-sounds-highlight.show, .record-highlight.show, .mix-highlight.show{
@@ -890,7 +888,7 @@
         /* background-color: var(--bg); */
         position: fixed;
         /* top: calc(50vh - 125px); */
-        bottom: 10px;
+        bottom: 20px;
         left: calc(50vw - 150px);
         z-index: 100;
         border-radius: 50px;
@@ -972,16 +970,14 @@
     }
 
     .mix-highlight{
+        font-size: 30px;
         position: fixed;
-        width: 192.16px;
-        height: 39px !important; 
-        left: calc(50% - 98px);
-        top: 369.75px;
         pointer-events: none;
         z-index: 1000;
-        border: solid 3px var(--rec);
-        border-radius: 20px;
+        color: var(--rec);
         display: none;
+        top: 365px;
+        left: 20%;
     }
 
     #export-row { 

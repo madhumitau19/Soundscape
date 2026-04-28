@@ -803,143 +803,6 @@ function extendedFingers(lms) {
   return count;
 }
 
-// ── Fist detection ───────────────────────────────────────────────
-// Returns true when all 4 fingers are curled (fist / closed hand)
-// function isFist(lms) {
-//   // All 4 fingertips must be BELOW their PIP joint (curled in)
-//   const pairs = [[8,6],[12,10],[16,14],[20,18]];
-//   for (const [tip, pip] of pairs) {
-//     if (lms[tip].y < lms[pip].y - 0.01) return false; // finger is extended
-//   }
-//   return true;
-// }
-
-// ── One finger up (index only extended) ──────────────────────────
-// function isOneFingerUp(lms) {
-//   // Index tip clearly above its PIP
-//   const indexUp = lms[8].y < lms[6].y - 0.04;
-//   // Middle, ring, pinky must be curled
-//   const midDown  = lms[12].y >= lms[10].y - 0.01;
-//   const ringDown = lms[16].y >= lms[14].y - 0.01;
-//   const pinDown  = lms[20].y >= lms[18].y - 0.01;
-//   return indexUp && midDown && ringDown && pinDown;
-// }
-
-// ── Thumbs up (thumb pointing up, all 4 fingers curled) ──────────
-// function isThumbsUp(lms) {
-//   // All 4 fingers must be curled
-//   const pairs = [[8,6],[12,10],[16,14],[20,18]];
-//   for (const [tip, pip] of pairs) {
-//     if (lms[tip].y < lms[pip].y - 0.02) return false; // finger extended
-//   }
-//   // Thumb tip must be clearly ABOVE the thumb's MCP base (lms[2]) — pointing up
-//   const thumbUp = lms[4].y < lms[2].y - 0.06;
-//   // Thumb tip must also be above wrist
-//   const aboveWrist = lms[4].y < lms[0].y - 0.04;
-//   return thumbUp && aboveWrist;
-// }
-
-// ── Menu scroll via gesture hold ─────────────────────────────────
-// Interval between scroll steps while gesture is held (ms)
-// const SCROLL_INTERVAL_MS  = 160;
-// // Delay before auto-scroll starts after fist is formed (ms)
-// const SCROLL_START_DELAY  = 280;
-
-// function updateScrollGesture(side, gesture) {
-//   // gesture: 'fist' | 'one-finger' | null
-//   const h = hands[side];
-//   const menuEl = document.getElementById('menu-' + side);
-//   const badge  = document.getElementById('badge-' + side);
-
-//   if (gesture === h.scrollGesture) return; // no change
-
-//   // Clear previous scroll timer
-//   clearTimeout(h.scrollTimer);
-//   clearInterval(h._scrollInterval);
-//   menuEl.classList.remove('scrolling-down', 'scrolling-up');
-
-//   h.scrollGesture = gesture;
-
-//   if (gesture === 'fist') {
-//     // Scroll DOWN (forward) — advance through list
-//     badge.textContent = '✊';
-//     menuEl.classList.add('scrolling-down');
-//     const doScroll = () => { menuScroll(side, 1); };
-//     h.scrollTimer = setTimeout(() => {
-//       doScroll();
-//       h._scrollInterval = setInterval(doScroll, SCROLL_INTERVAL_MS);
-//     }, SCROLL_START_DELAY);
-//   } else if (gesture === 'one-finger') {
-//     // Scroll UP (reverse)
-//     badge.textContent = '☝';
-//     menuEl.classList.add('scrolling-up');
-//     const doScroll = () => { menuScroll(side, -1); };
-//     h.scrollTimer = setTimeout(() => {
-//       doScroll();
-//       h._scrollInterval = setInterval(doScroll, SCROLL_INTERVAL_MS);
-//     }, SCROLL_START_DELAY);
-//   } else {
-//     badge.textContent = '';
-//   }
-// }
-
-// ── Swipe detection ──────────────────────────────────────────────
-// New approach:
-//   • Only fires on HORIZONTAL (X-axis) movement — never conflicts with pitch (Y) or spread
-//   • Only fires when hand is in a FIST — prevents accidental triggers while conducting
-//   • Uses VELOCITY (dist/time) not just distance — slow drifts never trigger
-//   • Requires movement to be >70% horizontal (directionality check)
-//   • Long cooldown (1.5s) so a single swipe can't multi-fire
-
-// const SWIPE_COOLDOWN_MS  = 1500;
-// const SWIPE_VELOCITY_MIN = 0.55;  // normalised units per second — must be fast
-// const SWIPE_DIST_MIN     = 0.18;  // minimum total horizontal travel
-// const SWIPE_WINDOW_MS    = 400;   // look-back window
-
-// function detectSwipe(side, lms) {
-//   const h   = hands[side];
-//   const now = performance.now();
-
-//   // Use wrist X in display space (mirrored: 1 - lms[0].x)
-//   const xNow = 1 - lms[0].x;
-//   const yNow = lms[0].y;
-
-//   h.xHistory.push({ t: now, x: xNow, y: yNow });
-//   // Prune old entries
-//   while (h.xHistory.length > 0 && now - h.xHistory[0].t > SWIPE_WINDOW_MS) {
-//     h.xHistory.shift();
-//   }
-
-//   // Enforce cooldown
-//   if (h.swipeCd > now) return null;
-//   // Need enough history
-//   if (h.xHistory.length < 5) return null;
-
-//   // GATE: must be a fist right now
-//   if (!isFist(lms)) return null;
-
-//   const oldest  = h.xHistory[0];
-//   const dt      = (now - oldest.t) / 1000; // seconds
-//   const dx      = xNow - oldest.x;         // horizontal travel
-//   const dy      = yNow - oldest.y;         // vertical travel
-
-//   // Directionality: horizontal travel must dominate
-//   if (Math.abs(dx) < Math.abs(dy) * 1.8) return null;
-
-//   // Distance threshold
-//   if (Math.abs(dx) < SWIPE_DIST_MIN) return null;
-
-//   // Velocity threshold — must be a brisk flick, not a slow drift
-//   const velocity = Math.abs(dx) / dt;
-//   if (velocity < SWIPE_VELOCITY_MIN) return null;
-
-//   // Confirmed swipe!
-//   h.swipeCd  = now + SWIPE_COOLDOWN_MS;
-//   h.xHistory = [];
-//   dbg(`Swipe! dx=${dx.toFixed(3)} vel=${velocity.toFixed(2)}`);
-//   return 'new-sound';
-// }
-
 const flashTimers={};
 function flashCard(side){const el=document.getElementById('flash-'+side);el.classList.add('show');clearTimeout(flashTimers[side]);flashTimers[side]=setTimeout(()=>el.classList.remove('show'),220);}
 
@@ -1400,7 +1263,7 @@ tutorialClose.addEventListener("click", ()=> {
 
 let startTutorial = document.getElementById("tut-yes");
 function tutorial(){
-    instruction.innerHTML = "Hold up both hands";
+    instruction.innerHTML = "*Try each step as it's displayed.*<br><br>Hold up both hands";
     
     const check = setInterval(() => {
         if (seenLeft && seenRight) {
@@ -1430,7 +1293,7 @@ function tutorial(){
                         nextLayerMix = document.getElementById('next-layermix');
                         nextLayerMix.addEventListener('click', ()=>{
                             instruction.innerHTML =
-                            "When you have multiple layers, generate a mix + download<div id='next-final' class='next-btn'>GOT IT!</div>";
+                            "Then generate a mix + download<div id='next-final' class='next-btn'>GOT IT!</div>";
                             recordHL.forEach(el => el.classList.remove("show"));
                             mixHL.forEach(el => el.classList.add("show"));
                             nextFinal = document.getElementById('next-final');

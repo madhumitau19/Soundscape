@@ -46,7 +46,7 @@
     z-index:10; 
     position: fixed;
     width: 100vw;
-    top: 380px;
+    top: 45dvh;
   } 
   h1 { 
     font-family:'Inconsolata',monospace; 

@@ -975,7 +975,7 @@
         position: fixed;
         width: 192.16px;
         height: 39px !important; 
-        left: calc(50% - 101px);
+        left: calc(50% - 98px);
         top: 369.75px;
         pointer-events: none;
         z-index: 1000;
@@ -986,7 +986,6 @@
 
     #export-row { 
         flex-direction: column;
-        gap: 10px;
     }
 
 }

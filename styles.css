@@ -910,7 +910,7 @@
         border: solid 3px var(--rec);
         border-radius: 100px;
         position: fixed;
-        top: 9px;
+        top: 10px;
         pointer-events: none;
         z-index: 1000;
         display: none;
@@ -930,7 +930,7 @@
         border: solid 3px var(--rec);
         border-radius: 100px;
         position: fixed;
-        top: 9px;
+        top: 10px;
         pointer-events: none;
         z-index: 1000;
         display: none;
@@ -945,7 +945,7 @@
     .pitch-vol-highlight{
         font-size: 30px;
         position: fixed;
-        top: 130px;
+        top: 131px;
         pointer-events: none;
         z-index: 1000;
         color: var(--rec);
@@ -960,7 +960,7 @@
 
     .record-highlight{
         position: fixed;
-        top: 229px;
+        top: 230px;
         pointer-events: none;
         z-index: 1000px;
         border: solid 3px var(--rec);
@@ -976,7 +976,7 @@
         width: 192.16px;
         height: 33.5px;
         left: calc(50% - 101px);
-        top: 367.5px;
+        top: 368.5px;
         pointer-events: none;
         z-index: 1000px;
         border: solid 3px var(--rec);

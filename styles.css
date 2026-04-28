@@ -984,5 +984,10 @@
         display: none;
     }
 
+    #export-row { 
+        flex-direction: column;
+        gap: 10px;
+     }
+
 }
 

@@ -906,7 +906,7 @@
     }
 
     .sound-menu-highlight{
-        height: 39.5px;
+        height: 40px;
         border: solid 3px var(--rec);
         border-radius: 100px;
         position: fixed;
@@ -926,7 +926,7 @@
 
     .more-sounds-highlight{
         width: 40px;
-        height: 38.5px;
+        height: 40px;
         border: solid 3px var(--rec);
         border-radius: 100px;
         position: fixed;
@@ -966,7 +966,7 @@
         border: solid 3px var(--rec);
         border-radius: 20px;
         width: 102.97px;
-        height: 34.5px;
+        height: 36px;
         left: 5%;
         display: none;
     }
@@ -974,7 +974,7 @@
     .mix-highlight{
         position: fixed;
         width: 192.16px;
-        height: 33.5px;
+        height: 35px;
         left: calc(50% - 101px);
         top: 368.5px;
         pointer-events: none;

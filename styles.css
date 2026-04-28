@@ -906,7 +906,7 @@
     }
 
     .sound-menu-highlight{
-        height: 38.5px;
+        height: 39.5px;
         border: solid 3px var(--rec);
         border-radius: 100px;
         position: fixed;

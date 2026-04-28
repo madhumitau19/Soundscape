@@ -974,9 +974,9 @@
     .mix-highlight{
         position: fixed;
         width: 192.16px;
-        height: 37px;
+        height: 50px;
         left: calc(50% - 101px);
-        top: 369px;
+        top: 368.5px;
         pointer-events: none;
         z-index: 1000px;
         border: solid 3px var(--rec);

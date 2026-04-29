@@ -534,11 +534,11 @@ function renderLayerRow(layer, blob) {
     layer._paused = !layer._paused;
     if (layer._paused) {
       try { layer.player.stop(); } catch(e){}
-      playBtn.textContent = '▶';
+      playBtn.textContent = '▶\uFE0E';
       row.classList.remove('playing');
     } else {
       try { layer.player.start(); } catch(e){}
-      playBtn.textContent = '⏸';
+      playBtn.textContent = '⏸\uFE0E';
       row.classList.add('playing');
     }
   });
@@ -547,11 +547,11 @@ function renderLayerRow(layer, blob) {
   const rewBtn = document.createElement('button');
   rewBtn.className = 'layer-btn';
   rewBtn.title = 'Rewind to start';
-  rewBtn.textContent = '⏮';
+  rewBtn.textContent = '⏮\uFE0E';
   rewBtn.addEventListener('click', () => {
     try { layer.player.stop(); layer.player.start(); } catch(e){}
     layer._paused = false;
-    playBtn.textContent = '⏸';
+    playBtn.textContent = '⏸\uFE0E';
     row.classList.add('playing');
     prog.style.width = '0%';
   });

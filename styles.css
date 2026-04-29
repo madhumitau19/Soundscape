@@ -137,11 +137,11 @@
   /* .hand-card.left-hand  { border-left:2px solid var(--left); }
   .hand-card.right-hand { border-left:2px solid var(--right); } */
 
-  .hand-label { font-size:10px; letter-spacing:0.22em; text-transform:uppercase; color:var(--muted); margin-bottom:5px; }
+  .hand-label { font-size:11px; letter-spacing:0.22em; text-transform:uppercase; color:var(--muted); margin-bottom:5px; }
   .sound-name { font-family:'Cormorant Garamond',serif; font-size:1rem; font-weight:300; font-style:italic; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-bottom:2px; min-height:1.3rem; }
   .left-hand  .sound-name { color:var(--left); }
   .right-hand .sound-name { color:var(--right); }
-  .sound-tags { font-size:9px; letter-spacing:0.08em; color:var(--muted); margin-bottom:8px; min-height:12px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .sound-tags { font-size:11px; letter-spacing:0.08em; color:var(--muted); margin-bottom:8px; min-height:12px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
   .spinner { display:none; width:12px; height:12px; border:1.5px solid rgba(255,255,255,0.1); border-top-color:var(--left); border-radius:50%; animation:spin 0.7s linear infinite; margin-bottom:8px; }
   .right-hand .spinner { border-top-color:var(--right); }
   .spinner.show { display:inline-block; }
@@ -150,7 +150,7 @@
   .playhead { height:100%; width:0%; transition:width 0.3s linear; }
   .left-hand  .playhead { background:var(--left); }
   .right-hand .playhead { background:var(--right); }
-  .hand-meta { font-size:10px; color:var(--muted); letter-spacing:0.06em; display:flex; flex-direction:column; gap:3px; }
+  .hand-meta { font-size:11px; color:var(--muted); letter-spacing:0.06em; display:flex; flex-direction:column; gap:3px; }
   .vol-bar-wrap { width:100%; height:2px; background:rgba(255,255,255,0.06); margin-top:5px; }
   .vol-bar { height:100%; width:0%; transition:width 0.1s; }
   .left-hand  .vol-bar { background:var(--left); }
@@ -219,12 +219,12 @@
   }
   .layer-row.playing { border-color:rgba(108, 0, 52, 0.35); }
 
-  .layer-num { font-size:10px; color:var(--bord); letter-spacing:0.1em; min-width:18px; }
+  .layer-num { font-size:11px; color:var(--bord); letter-spacing:0.1em; min-width:18px; }
 
   .layer-waveform { flex:1; height:28px; position:relative; overflow:hidden; }
   .layer-waveform canvas { width:100%; height:100%; display:block; }
 
-  .layer-duration { font-size:10px; color:var(--bord); min-width:38px; text-align:right; font-variant-numeric:tabular-nums; }
+  .layer-duration { font-size:11px; color:var(--bord); min-width:38px; text-align:right; font-variant-numeric:tabular-nums; }
 
   .layer-progress {
     position:absolute; top:0; left:0; height:100%;
@@ -233,7 +233,7 @@
   }
 
   .layer-btn {
-    padding:5px 10px; font-family:'Inconsolata',monospace; font-size:10px; letter-spacing:0.12em; text-transform:uppercase;
+    padding:5px 10px; font-family:'Inconsolata',monospace; font-size:11px; letter-spacing:0.12em; text-transform:uppercase;
     background:transparent; border:1px solid var(--bord); color:var(--muted); cursor:pointer;
     transition:border-color 0.15s,color 0.15s,background 0.15s; white-space:nowrap;
     border-radius: 30px;
@@ -390,13 +390,13 @@
     -webkit-overflow-scrolling: touch;
     flex: 1;
     min-height: 0;
-    padding-bottom: 40px;
+    padding-bottom: 10px;
     }
   #menu-inner-left.show, #menu-inner-right.show {
     display: block !important;
     }
   .menu-item {
-    padding:5px 12px; font-size:10px; letter-spacing:0.1em; text-transform:uppercase;
+    padding:4.25px 12px; font-size:11px; letter-spacing:0.1em; text-transform:uppercase;
     color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; cursor:pointer; line-height:1.6;
     flex-shrink: 0;
     transition: all 0.1s ease-in-out;
@@ -560,7 +560,7 @@
   }
   .search-result-item{
     text-transform: uppercase;
-    font-size: 10px;
+    font-size: 11px;
     letter-spacing: 0.1em;
     font-weight: 500;
     transition: all 0.2s ease-in-out;
@@ -649,7 +649,7 @@
     padding: 4px;
     font-weight: 500;
     letter-spacing: 0.1em;
-    font-size: 10px;
+    font-size: 11px;
     text-transform: uppercase;
   }
   #search-btn-left{

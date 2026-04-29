@@ -458,14 +458,14 @@
   .layer-transport .layer-btn { padding:4px 8px; font-size:11px; line-height:1; }
 
   #instruction{
-    width: 300px;
-    height: 250px;
+    width: 270px;
+    height: 150px;
     border: solid var(--bord) 1px;
     /* background-color: var(--bg); */
     position: fixed;
     /* top: calc(50vh - 125px); */
     bottom: 80px;
-    left: calc(50vw - 150px);
+    left: calc(50vw - 125px);
     z-index: 100;
     border-radius: 50px;
     display: none;

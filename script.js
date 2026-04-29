@@ -528,7 +528,7 @@ function renderLayerRow(layer, blob) {
   const playBtn = document.createElement('button');
   playBtn.className = 'layer-btn';
   playBtn.title = 'Play / Pause';
-  playBtn.textContent = '⏸';
+  playBtn.textContent = '⏸\uFE0E';
   layer._paused = false;
   playBtn.addEventListener('click', () => {
     layer._paused = !layer._paused;

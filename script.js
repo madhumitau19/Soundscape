@@ -1177,7 +1177,7 @@ searchRightBtn.addEventListener("click", ()=> {
             searchLeft.classList.remove("show");
             searchLeftBtn.classList.toggle("close");
             if (searchLeftBtn.classList.contains("close")) {
-                ssearchLeftBtn.innerHTML = "×";
+                searchLeftBtn.innerHTML = "×";
             } else{
             searchLeftBtn.innerHTML = "+";
             }

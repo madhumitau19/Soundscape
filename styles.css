@@ -237,6 +237,7 @@
     background:transparent; border:1px solid var(--bord); color:var(--muted); cursor:pointer;
     transition:border-color 0.15s,color 0.15s,background 0.15s; white-space:nowrap;
     border-radius: 30px;
+    font-variant-emoji: text;
   }
   
   .layer-btn.muted { color:var(--rec); border-color:rgba(226,75,74,0.4); }
@@ -580,7 +581,7 @@
   
   .search-window-header{
     /* text-transform: uppercase; */
-    font-size: 10px;
+    font-size: 11px;
     letter-spacing: 0.1em;
     font-weight: 500;
     line-height: 110%;
@@ -627,7 +628,7 @@
     border-radius: 15px;
     background-color: var(--bg);
     text-transform: uppercase;
-    font-size: 10px;
+    font-size: 11px;
     letter-spacing: 0.1em;
     font-weight: 500;
     font-family:'Inconsolata',monospace;

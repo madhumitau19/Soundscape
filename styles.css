@@ -27,8 +27,8 @@
 
   /* ── Fullscreen camera — fixed behind everything ── */
   #canvas-wrap {
-    display:none; position:fixed; inset:0; z-index:0;
-    overflow:hidden;
+    display:none; position:fixed; inset:0; z-index:1000;
+    overflow:hidden; pointer-events: none;
   }
   #video {
     position:absolute; inset:0; width:100%; height:100%;
@@ -59,8 +59,7 @@
   /* .rule  { width:100%; max-width:800px; height:1px; position:relative; z-index:10; margin:0.6rem 0; background:linear-gradient(90deg,transparent,var(--bord) 20%,var(--bord) 80%,transparent); }*/
   main { 
     width:100%; 
-    position:relative; 
-    z-index:10;
+    position:relative;
     }
 
   /* ── Setup ── */
@@ -464,9 +463,9 @@
     /* background-color: var(--bg); */
     position: fixed;
     /* top: calc(50vh - 125px); */
-    bottom: 80px;
+    bottom: 280px;
     left: calc(50vw - 125px);
-    z-index: 100;
+    z-index: 1001;
     border-radius: 50px;
     display: none;
     backdrop-filter:blur(4px);
@@ -516,10 +515,28 @@
     display: flex;
   }
 
+  #blur {
+    width: 100dvw;
+    height: 100dvh;
+    position: fixed;
+    inset: 0;
+    z-index: 999;
+    pointer-events: none;
+    display: none;
+    background-color: var(--bg);
+    opacity: 0.8;
+    backdrop-filter: blur(6px);
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    }
+    #blur.show {
+        display: block;
+    }
+
   .next-btn{
     border-radius: 100px;
     padding: 10px 30px;
-    margin-top: 30px;
+    margin-top: 10px;
     border: solid 1px var(--bord);
     transition: all 0.2s ease-in-out;
   }
@@ -545,6 +562,10 @@
   }
   #search-toggle-right.close{
   }
+
+  /* #hand-cards.top, #menu-left-title.top, #menu-right-title.top, #search-toggle-left.top, #search-toggle-right.top, #rec-panel.top, #export-row.top {
+    z-index: 1001;
+  } */
 
   /* .search-window{
     overflow-y: scroll;
@@ -883,21 +904,21 @@
     }
 
     #instruction{
-        width: 300px;
-        height: 200px;
+        width: 270px;
+        height: 140px;
         border: solid var(--bord) 1px;
         /* background-color: var(--bg); */
         position: fixed;
         /* top: calc(50vh - 125px); */
-        bottom: 20px;
-        left: calc(50vw - 150px);
-        z-index: 100;
+        bottom: 80px;
+        left: calc(50vw - 135px);
+        z-index: 1003;
         border-radius: 50px;
         display: none;
         backdrop-filter:blur(4px);
         text-align: center;
         padding: 20px;
-        font-size: 13px; 
+        font-size: 16px; 
     }
     .next-btn{
         margin-top: 10px;

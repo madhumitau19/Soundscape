@@ -57,6 +57,7 @@
   <div id="canvas-wrap">
     <video id="video" autoplay playsinline muted></video>
     <canvas id="overlay"></canvas>
+    <canvas id="blur-canvas"></canvas>
 
     <!-- Sound menus overlaid on the video -->
     
@@ -106,12 +107,12 @@
     </div>
 
     <div id="rec-panel">
-    <div class="rec-controls">
-      <button class="btn-rec" id="btn-record">&#9679; Record</button>
-      <button class="btn-rec" id="btn-stop" disabled>&#9632; Stop</button>
-      <span id="status-rec" style="font-size:11px;color:var(--muted);letter-spacing:0.08em;flex:1"></span>
+      <div class="rec-controls">
+        <button class="btn-rec" id="btn-record">&#9679; Record</button>
+        <button class="btn-rec" id="btn-stop" disabled>&#9632; Stop</button>
+        <span id="status-rec" style="font-size:11px;color:var(--muted);letter-spacing:0.08em;flex:1"></span>
+      </div>
     </div>
-  </div>
 
   <!-- Recording controls -->
   
@@ -133,6 +134,7 @@
       <div id="tut-no">CLOSE</div>
     </div>
   </div>
+  <div id="blur"></div>
   <div id="pitch-vol-highlight-left" class="pitch-vol-highlight highlight">→</div>
   <div id="pitch-vol-highlight-right" class="pitch-vol-highlight highlight">←</div>
   <div id="sound-menu-highlight-left" class="sound-menu-highlight highlight"></div>
@@ -159,6 +161,45 @@
   </div>
   <div class="search-window-results" id="search-results-right"></div>
 </div>
+
+<!--DUPES
+
+    <div id="hand-cards">
+      <div class="hand-card left-hand">
+        <div class="swipe-flash" id="flash-left"></div>
+        <div class="hand-label">Left hand</div>
+        <div class="spinner" id="spin-left"></div>
+        <div class="sound-name" id="left-name">— waiting —</div>
+        <div class="sound-tags" id="left-tags"></div>
+        <div class="playhead-wrap"><div class="playhead" id="left-playhead"></div></div>
+        <div class="hand-meta">
+          <span id="left-pitch-label">pitch: —</span>
+          <span id="left-vol-label">vol: —</span>
+        </div>
+        <div class="vol-bar-wrap"><div class="vol-bar" id="left-bar"></div></div>
+      </div>
+      <div class="hand-card right-hand">
+        <div class="swipe-flash" id="flash-right"></div>
+        <div class="hand-label">Right hand</div>
+        <div class="spinner" id="spin-right"></div>
+        <div class="sound-name" id="right-name">— waiting —</div>
+        <div class="sound-tags" id="right-tags"></div>
+        <div class="playhead-wrap"><div class="playhead" id="right-playhead"></div></div>
+        <div class="hand-meta">
+          <span id="right-pitch-label">pitch: —</span>
+          <span id="right-vol-label">vol: —</span>
+        </div>
+        <div class="vol-bar-wrap"><div class="vol-bar" id="right-bar"></div></div>
+      </div>
+    </div>
+
+    <div id="rec-panel">
+      <div class="rec-controls">
+        <button class="btn-rec" id="btn-record">&#9679; Record</button>
+        <button class="btn-rec" id="btn-stop" disabled>&#9632; Stop</button>
+        <span id="status-rec" style="font-size:11px;color:var(--muted);letter-spacing:0.08em;flex:1"></span>
+      </div>
+    </div> -->
 
 
 

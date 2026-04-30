@@ -1,5 +1,7 @@
 let seenLeft = false;
 let seenRight = false;
+let tutorialActive = false;
+let tutorialSearchStep = false;
 // ═══════════════════════════════════════════════════════════════════
 //  CONFIG
 // ═══════════════════════════════════════════════════════════════════
@@ -480,7 +482,12 @@ async function finaliseRecording() {
   document.getElementById('status-rec').textContent = '';
   document.getElementById('layers-wrap').style.display = 'flex';
   document.getElementById('layers-wrap').style.flexDirection = 'column';
+  document.getElementById('layers-wrap').style.visibility = '';
+  document.getElementById('layers-wrap').classList.remove('temp-wrap'); 
   document.getElementById('btn-mix').disabled = false;
+  document.getElementById('export-row').style.display = 'flex';
+  document.getElementById('export-row').style.visibility = '';
+  document.getElementById('export-row').classList.remove('temp');
 
   renderLayerRow(layer, blob);
 }
@@ -939,92 +946,106 @@ const menuRightInner = document.getElementById("menu-inner-right");
 const menuLeft = document.getElementById("menu-left");
 const menuRight = document.getElementById("menu-right");
 
-menuLeftTitle.addEventListener("click", () => {
-    menuLeft.classList.toggle("show");
-    menuLeftTitle.classList.toggle("clicked");
-    if (menuLeftTitle.classList.contains("clicked")){
-        menuLeftTitle.innerHTML = "LEFT HAND ×";
-    } else {
-        menuLeftTitle.innerHTML = "LEFT HAND ↓";
-    };
+function menuLeftClicked() {
+    if (!tutorialActive) {
+        if (menuLeftTitle.classList.contains("clicked")){
+            menuLeftTitle.innerHTML = "LEFT HAND ×";
+        } else {
+            menuLeftTitle.innerHTML = "LEFT HAND ↓";
+        }
+    }
     if (searchLeft.classList.contains("show")){
         searchLeft.classList.remove("show");
         searchLeftBtn.classList.toggle("close");
         if (searchLeftBtn.classList.contains("close")) {
             searchLeftBtn.innerHTML = "×";
-        } else{
-        searchLeftBtn.innerHTML = "+";
-    }
-    } else;
-    if (window.innerWidth <= 800) {
-        if (menuLeftTitle.classList.contains("clicked")){
-            menuLeftTitle.innerHTML = "×";
         } else {
-            menuLeftTitle.innerHTML = "L";
-        };
-        if (menuRightTitle.classList.contains("clicked")){
-            menuRightTitle.classList.remove("clicked");
-            menuRight.classList.toggle("show");
-            if (menuRightTitle.classList.contains("clicked")) {
-                menuRightTitle.innerHTML = "×";
+            searchLeftBtn.innerHTML = "+";
+        }
+    }
+    if (window.innerWidth <= 800) {
+        if (!tutorialActive) {
+            if (menuLeftTitle.classList.contains("clicked")){
+                menuLeftTitle.innerHTML = "×";
             } else {
-            menuRightTitle.innerHTML = "R"; 
-            };
-        } else;
-        if (searchRight.classList.contains("show")){
-            searchRight.classList.remove("show");
-            searchRightBtn.classList.toggle("close");
-            if (searchRightBtn.classList.contains("close")) {
-                searchRightBtn.innerHTML = "×";
-            } else{
-            searchRightBtn.innerHTML = "+";
+                menuLeftTitle.innerHTML = "L";
             }
-        } else;    
-    } else;
+            if (menuRightTitle.classList.contains("clicked")){
+                menuRightTitle.classList.remove("clicked");
+                menuRight.classList.toggle("show");
+                menuRightTitle.innerHTML = "R";
+            }
+            if (searchRight.classList.contains("show")){
+                searchRight.classList.remove("show");
+                searchRightBtn.classList.toggle("close");
+                searchRightBtn.innerHTML = searchRightBtn.classList.contains("close") ? "×" : "+";
+            }
+        }
+    }
+};
+
+menuLeftTitle.addEventListener("click", () => {
+    menuLeft.classList.toggle("show");
+    menuLeftTitle.classList.toggle("clicked");
+    if (tutorialActive) {
+        const isOpen = menuLeftTitle.classList.contains("clicked");
+        menuLeftTitle.innerHTML = isOpen 
+            ? (window.innerWidth <= 800 ? "×" : "LEFT HAND ×") 
+            : (window.innerWidth <= 800 ? "L" : "LEFT HAND ↓");
+    } else {
+        menuLeftClicked();
+    }
 });
 
-menuRightTitle.addEventListener("click", () => {
-    menuRight.classList.toggle("show");
-    menuRightTitle.classList.toggle("clicked");
-    if (menuRightTitle.classList.contains("clicked")){
-        menuRightTitle.innerHTML = "× RIGHT HAND";
-    } else {
-        menuRightTitle.innerHTML = "↓ RIGHT HAND";
-    };
+function menuRightClicked() {
+    if (!tutorialActive) {
+        if (menuRightTitle.classList.contains("clicked")){
+            menuRightTitle.innerHTML = "× RIGHT HAND";
+        } else {
+            menuRightTitle.innerHTML = "↓ RIGHT HAND";
+        }
+    }
     if (searchRight.classList.contains("show")){
         searchRight.classList.remove("show");
         searchRightBtn.classList.toggle("close");
         if (searchRightBtn.classList.contains("close")) {
             searchRightBtn.innerHTML = "×";
-        } else{
-        searchRightBtn.innerHTML = "+";
-        }
-    } else;
-    if (window.innerWidth <= 800) {
-        if (menuRightTitle.classList.contains("clicked")){
-            menuRightTitle.innerHTML = "×";
         } else {
-            menuRightTitle.innerHTML = "R";
-        };
-        if (menuLeftTitle.classList.contains("clicked")){
-            menuLeftTitle.classList.remove("clicked");
-            menuLeft.classList.toggle("show");
-            if (menuLeftTitle.classList.contains("clicked")) {
-                menuLeftTitle.innerHTML = "×";
+            searchRightBtn.innerHTML = "+";
+        }
+    }
+    if (window.innerWidth <= 800) {
+        if (!tutorialActive) {
+            if (menuRightTitle.classList.contains("clicked")){
+                menuRightTitle.innerHTML = "×";
             } else {
-                menuLeftTitle.innerHTML = "L"; 
-            };
-        } else;
-        if (searchLeft.classList.contains("show")){
-            searchLeft.classList.remove("show");
-            searchLeftBtn.classList.toggle("close");
-            if (searchLeftBtn.classList.contains("close")) {
-                searchLeftBtn.innerHTML = "×";
-            } else{
-            searchLeftBtn.innerHTML = "+";
+                menuRightTitle.innerHTML = "R";
             }
-        } else;
-    };
+            if (menuLeftTitle.classList.contains("clicked")){
+                menuLeftTitle.classList.remove("clicked");
+                menuLeft.classList.toggle("show");
+                menuLeftTitle.innerHTML = "L";
+            }
+            if (searchLeft.classList.contains("show")){
+                searchLeft.classList.remove("show");
+                searchLeftBtn.classList.toggle("close");
+                searchLeftBtn.innerHTML = searchLeftBtn.classList.contains("close") ? "×" : "+";
+            }
+        }
+    }
+};
+
+menuRightTitle.addEventListener("click", () => {
+    menuRight.classList.toggle("show");
+    menuRightTitle.classList.toggle("clicked");
+    if (tutorialActive) {
+        const isOpen = menuRightTitle.classList.contains("clicked");
+        menuRightTitle.innerHTML = isOpen 
+            ? (window.innerWidth <= 800 ? "×" : "× RIGHT HAND") 
+            : (window.innerWidth <= 800 ? "R" : "↓ RIGHT HAND");
+    } else {
+        menuRightClicked();
+    }
 });
 
 let activeMenuSide = 'left'; // default
@@ -1107,9 +1128,7 @@ let searchRightBtn = document.getElementById('search-toggle-right');
 let searchLeft = document.getElementById('search-left');
 let searchRight = document.getElementById('search-right');
 
-searchLeftBtn.addEventListener("click", ()=> {
-    searchLeft.classList.toggle("show");
-    searchLeftBtn.classList.toggle("close");
+function searchLeftClicked(){
     if (searchLeftBtn.classList.contains("close")) {
         searchLeftBtn.innerHTML = "×";
     } else{
@@ -1149,10 +1168,25 @@ searchLeftBtn.addEventListener("click", ()=> {
             };
         } else;
     };
+};
+searchLeftBtn.addEventListener("click", ()=> {
+    searchLeft.classList.toggle("show");
+    searchLeftBtn.classList.toggle("close");
+    searchLeftClicked();
+    if (tutorialActive) {
+        searchLeftBtn.innerHTML = searchLeft.classList.contains("show") ? "×" : "+";
+    }
+    if (tutorialSearchStep) {
+        requestAnimationFrame(() => {
+            const els = [searchLeftBtn, searchRightBtn];
+            if (searchLeft.classList.contains("show")) els.push(searchLeft);
+            if (searchRight.classList.contains("show")) els.push(searchRight);
+            highlightElement(els);
+        });
+    }
 });
-searchRightBtn.addEventListener("click", ()=> {
-    searchRight.classList.toggle("show");
-    searchRightBtn.classList.toggle("close");
+
+function searchRightClicked(){
     if (searchRightBtn.classList.contains("close")) {
         searchRightBtn.innerHTML = "×";
     } else{
@@ -1192,6 +1226,22 @@ searchRightBtn.addEventListener("click", ()=> {
             };
         } else;
     };
+};
+searchRightBtn.addEventListener("click", ()=> {
+    searchRight.classList.toggle("show");
+    searchRightBtn.classList.toggle("close");
+    searchRightClicked();
+    if (tutorialActive) {
+        searchRightBtn.innerHTML = searchRight.classList.contains("show") ? "×" : "+";
+    }
+    if (tutorialSearchStep) {
+        requestAnimationFrame(() => {
+            const els = [searchLeftBtn, searchRightBtn];
+            if (searchLeft.classList.contains("show")) els.push(searchLeft);
+            if (searchRight.classList.contains("show")) els.push(searchRight);
+            highlightElement(els);
+        });
+    }
 });
 
 ['left', 'right'].forEach(side => {
@@ -1250,82 +1300,251 @@ searchRightBtn.addEventListener("click", ()=> {
 });
 
 
-const pitchVolHL = document.querySelectorAll(".pitch-vol-highlight");
-const soundMenuHL = document.querySelectorAll(".sound-menu-highlight");
-const moreSoundsHL = document.querySelectorAll(".more-sounds-highlight");
-const recordHL = document.querySelectorAll(".record-highlight");
-const mixHL = document.querySelectorAll(".mix-highlight");
+// const pitchVolHL = document.querySelectorAll(".pitch-vol-highlight");
+// const soundMenuHL = document.querySelectorAll(".sound-menu-highlight");
+// const moreSoundsHL = document.querySelectorAll(".more-sounds-highlight");
+// const recordHL = document.querySelectorAll(".record-highlight");
+// const mixHL = document.querySelectorAll(".mix-highlight");
+let currentHighlightEls = null;
+
+function highlightElement(els) {
+    if (!Array.isArray(els)) els = [els];
+    currentHighlightEls = els;
+    renderHighlight(els);
+}
+
+function renderHighlight(els) {
+    const blur = document.getElementById('blur');
+    const instr = document.getElementById('instruction');
+    const W = window.innerWidth;
+    const H = window.innerHeight;
+
+    const info = document.getElementById('info');
+    const leftTop = document.getElementById('left-top');
+    const rightTop = document.getElementById('right-top');
+    const menuLeftEl = document.getElementById('menu-left');
+    const menuRightEl = document.getElementById('menu-right');
+    const searchLeftEl = document.getElementById('search-left');
+    const searchRightEl = document.getElementById('search-right');
+
+    info.style.zIndex = els.some(el => info.contains(el)) ? '1001' : '';
+    leftTop.style.zIndex = els.some(el => leftTop.contains(el)) ? '1002' : '';
+    rightTop.style.zIndex = els.some(el => rightTop.contains(el)) ? '1002' : '';
+    menuLeftEl.style.zIndex = els.includes(menuLeftEl) ? '1001' : '';
+    menuRightEl.style.zIndex = els.includes(menuRightEl) ? '1001' : '';
+    searchLeftEl.style.zIndex = els.includes(searchLeftEl) ? '1001' : '';
+    searchRightEl.style.zIndex = els.includes(searchRightEl) ? '1001' : '';
+    const overlay = document.getElementById('overlay');
+    const cutouts = [...els, instr].map(el => {
+        const rect = el.getBoundingClientRect();
+        const rx = parseFloat(getComputedStyle(el).borderRadius) || 20;
+        return `<rect x="${rect.left}" y="${rect.top}" width="${rect.width}" height="${rect.height}" rx="${rx}" ry="${rx}" fill="black"/>`;
+    }).join('');
+
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}">
+        <rect width="100%" height="100%" fill="white"/>
+        ${cutouts}
+    </svg>`;
+
+    const encoded = `url("data:image/svg+xml,${encodeURIComponent(svg)}")`;
+    blur.style.mask = encoded;
+    blur.style.webkitMask = encoded;
+}
+
+function clearHighlight() {
+    currentHighlightEls = null;
+    const blur = document.getElementById('blur');
+    document.getElementById('info').style.zIndex = '';
+    document.getElementById('left-top').style.zIndex = '';
+    document.getElementById('right-top').style.zIndex = '';
+    document.getElementById('menu-left').style.zIndex = '';
+    document.getElementById('menu-right').style.zIndex = '';
+    document.getElementById('search-left').style.zIndex = '';
+    document.getElementById('search-right').style.zIndex = '';
+    blur.style.mask = '';
+    blur.style.webkitMask = '';
+    // restore all visibility changes made during tutorial
+    handCards.style.visibility = '';
+    recPanel.style.visibility = '';
+    exportRow.style.visibility = '';
+    searchLeftBtn.style.visibility = '';
+    searchRightBtn.style.visibility = '';
+    menuLeftTitle.style.visibility = '';
+    menuRightTitle.style.visibility = '';
+    const layersLabel = document.getElementById('layers-label');
+    const layersList = document.getElementById('layers-list');
+    if (layersLabel) layersLabel.style.visibility = '';
+    if (layersList) layersList.style.visibility = '';
+    const layersWrap = document.getElementById('layers-wrap');
+    if (layersWrap && layersWrap.classList.contains('temp-wrap')) {
+        layersWrap.style.display = 'none';
+        layersWrap.style.visibility = '';
+        layersWrap.classList.remove('temp-wrap');
+    }
+    const exportRowEl = document.getElementById('export-row');
+    if (exportRowEl && exportRowEl.classList.contains('temp')) {
+        exportRowEl.style.display = 'none'; // back to its default (or '' if you prefer)
+        exportRowEl.style.visibility = '';
+        exportRowEl.classList.remove('temp');
+    }
+};
+
+window.addEventListener('resize', () => {
+    if (currentHighlightEls) renderHighlight(currentHighlightEls);
+});
+
+const handCards = document.getElementById("hand-cards");
+const recPanel = document.getElementById("rec-panel");
+const exportRow = document.getElementById("export-row");
 
 let tutorialClose = document.getElementById("tut-no");
 tutorialClose.addEventListener("click", ()=> {
+    tutorialActive = false;
     instruction.classList.remove("show");    
 });
 
 let startTutorial = document.getElementById("tut-yes");
+let blurOverlay = document.getElementById("blur");
 function tutorial(){
-    instruction.innerHTML = "*Try each step as it's displayed.*<br><br>Hold up both hands";
+    
+    tutorialActive = true;
+    blurOverlay.classList.add("show");
+    instruction.innerHTML = "Hold up both hands";
     
     const check = setInterval(() => {
         if (seenLeft && seenRight) {
             clearInterval(check);
-            // move to next step
             instruction.innerHTML = 
-            "Great!<br>Now try changing pitch/volume (the numbers change in the cards)- <br><br>• Fingers farther/closer apart for volume up/down<br>• Hands up/down for pitch up/down <div id='next-soundmenu' class='next-btn'>NEXT</div>";
-            pitchVolHL.forEach(el => el.classList.add("show"));
+            "Great.<br>Now try changing pitch(hands up/down) & volume(fingers farther/closer apart)<div id='next-soundmenu' class='next-btn'>NEXT</div>";
+            
+            recPanel.style.visibility = 'hidden';
+            exportRow.style.visibility = 'hidden';
+            searchLeftBtn.style.visibility = 'hidden';
+            searchRightBtn.style.visibility = 'hidden';
+            highlightElement([handCards]);
+            
             nextSoundMenu = document.getElementById('next-soundmenu');
-            nextSoundMenu.addEventListener('click', ()=> {
+            nextSoundMenu.addEventListener('click', () => {
                 instruction.innerHTML =
-                "You can select from 30 sounds with the sound menus <div id='next-moresounds' class='next-btn'>NEXT</div>";
-                pitchVolHL.forEach(el => el.classList.remove("show"));
-                soundMenuHL.forEach(el => el.classList.add("show"));
+                    "You can select from 30 sounds with the sound menus <div id='next-moresounds' class='next-btn'>NEXT</div>";
+                clearHighlight();
+                searchLeftBtn.style.visibility = 'hidden';
+                searchRightBtn.style.visibility = 'hidden';
+                recPanel.style.visibility = 'hidden';
+
+                if (window.innerWidth > 800) {
+                    menuLeft.classList.add("show");
+                    menuRight.classList.add("show");
+                    menuLeftTitle.classList.add("clicked");
+                    menuRightTitle.classList.add("clicked");
+                    menuLeftTitle.innerHTML = "LEFT HAND ×";
+                    menuRightTitle.innerHTML = "× RIGHT HAND";
+                }
+
+                 document.getElementById('left-top').style.zIndex = '1001';
+                document.getElementById('right-top').style.zIndex = '1001';
+
+                highlightElement([menuLeftTitle, menuRightTitle, menuLeft, menuRight]);
+
                 nextMoreSounds = document.getElementById('next-moresounds');
-                nextMoreSounds.addEventListener('click', ()=>{
+                nextMoreSounds.addEventListener('click', () => {
+
+                    menuLeft.classList.remove("show");
+                    menuRight.classList.remove("show");
+                    menuLeftTitle.classList.remove("clicked");
+                    menuRightTitle.classList.remove("clicked");
+
                     instruction.innerHTML =
-                    "Or use any sound from Freesounds<div id='next-record' class='next-btn'>NEXT</div>";
-                    soundMenuHL.forEach(el => el.classList.remove("show"));
-                    moreSoundsHL.forEach(el => el.classList.add("show"));
+                        "Or use any sound from Freesounds<div id='next-record' class='next-btn'>NEXT</div>";
+                    clearHighlight();
+                    tutorialSearchStep = true;
+
+                    searchLeftBtn.style.visibility = '';
+                    searchRightBtn.style.visibility = '';
+                    menuLeftTitle.style.visibility = 'hidden';
+                    menuRightTitle.style.visibility = 'hidden';
+                    recPanel.style.visibility = 'hidden';
+
+                    if (window.innerWidth > 800) {
+                        searchLeft.classList.add("show");
+                        searchRight.classList.add("show");
+                        searchLeftBtn.classList.add("clicked");
+                        searchRightBtn.classList.add("clicked");
+                        searchLeftBtn.innerHTML = "×";
+                        searchRightBtn.innerHTML = "×";
+                    }
+
+                    requestAnimationFrame(() => {
+                        const els = [searchLeftBtn, searchRightBtn];
+                        if (searchLeft.classList.contains("show")) els.push(searchLeft);
+                        if (searchRight.classList.contains("show")) els.push(searchRight);
+                        highlightElement(els);
+                    });
+
                     nextRecord = document.getElementById('next-record');
-                    nextRecord.addEventListener('click', ()=> {
+                    nextRecord.addEventListener('click', () => {
+                        tutorialSearchStep = false;
+
+                        searchLeft.classList.remove("show");
+                        searchRight.classList.remove("show");
+                        searchLeftBtn.classList.remove("clicked");
+                        searchRightBtn.classList.remove("clicked");
+
                         instruction.innerHTML =
-                        "Record your soundscape to save/download <div id='next-layermix' class='next-btn'>NEXT</div>";
-                        moreSoundsHL.forEach(el => el.classList.remove("show"));
-                        recordHL.forEach(el => el.classList.add("show"));
-                        nextLayerMix = document.getElementById('next-layermix');
-                        nextLayerMix.addEventListener('click', ()=>{
+                            "Record your soundscape, then bounce & download your mix <div id='next-final' class='next-btn'>GOT IT!</div>";
+                        clearHighlight();
+                        menuLeftTitle.style.visibility = '';
+                        menuRightTitle.style.visibility = '';
+                        recPanel.style.visibility = '';
+                        handCards.style.visibility = '';
+
+                        const layersWrap = document.getElementById('layers-wrap');
+                        const layersWasAlreadyVisible = layersWrap.style.display === 'flex';
+
+                        if (!layersWasAlreadyVisible) {
+                            layersWrap.style.display = 'flex';
+                            layersWrap.style.flexDirection = 'column';
+                            layersWrap.style.visibility = 'hidden';
+                            layersWrap.classList.add('temp-wrap');
+
+                            exportRow.style.display = 'flex';
+                            exportRow.classList.add('temp');
+                        }
+
+                        requestAnimationFrame(() => {
+                            highlightElement([recPanel, handCards, exportRow]);
+                        });
+
+                        nextFinal = document.getElementById("next-final");
+                        nextFinal.addEventListener('click', () => {
+                            console.log('nextFinal clicked');
+                            clearHighlight();
                             instruction.innerHTML =
-                            "Then generate a mix + download<div id='next-final' class='next-btn'>GOT IT!</div>";
-                            recordHL.forEach(el => el.classList.remove("show"));
-                            mixHL.forEach(el => el.classList.add("show"));
-                            nextFinal = document.getElementById('next-final');
-                            nextFinal.addEventListener('click', ()=>{
-                                instruction.innerHTML =
                                 "<div id='end-tutorial' class='next-btn'>I'm ready to start :D</div><div id='restart-tutorial' class='next-btn'>Restart Tutorial</div>";
-                                mixHL.forEach(el => el.classList.remove("show"));
-                                endTutorial = document.getElementById('end-tutorial');
-                                endTutorial.addEventListener("click", ()=>{
-                                    instruction.classList.remove("show"); 
-                                });
-                                restartTutorial = document.getElementById('restart-tutorial');
-                                restartTutorial.addEventListener("click", ()=>{
-                                    instruction.innerHTML = 
+
+                            endTutorial = document.getElementById('end-tutorial');
+                            endTutorial.addEventListener("click", () => {
+                                tutorialActive = false;
+                                instruction.classList.remove("show");
+                                blurOverlay.classList.remove("show");
+                            });
+
+                            restartTutorial = document.getElementById('restart-tutorial');
+                            restartTutorial.addEventListener("click", () => {
+                                instruction.innerHTML =
                                     "START TUTORIAL<div id='tut-confirm'><div id='tut-yes'>YES</div><div id='tut-no'>CLOSE</div></div>";
-                                    document.getElementById("tut-no").addEventListener("click", ()=> {
-                                        instruction.classList.remove("show");    
-                                    });
-                                    document.getElementById("tut-yes").addEventListener("click", tutorial);
+                                document.getElementById("tut-no").addEventListener("click", () => {
+                                    tutorialActive = false;
+                                    instruction.classList.remove("show");
                                 });
+                                document.getElementById("tut-yes").addEventListener("click", tutorial);
                             });
                         });
                     });
                 });
-                   
             });
         }
     }, 200);
-    
-};
+}
+
 startTutorial.addEventListener("click", tutorial);
-
-
-
-

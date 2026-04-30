@@ -1453,6 +1453,8 @@ function tutorial(){
                     menuRight.classList.remove("show");
                     menuLeftTitle.classList.remove("clicked");
                     menuRightTitle.classList.remove("clicked");
+                    menuLeftTitle.innerHTML = window.innerWidth <= 800 ? "L" : "LEFT HAND ↓";
+                    menuRightTitle.innerHTML = window.innerWidth <= 800 ? "R" : "↓ RIGHT HAND";
 
                     instruction.innerHTML =
                         "Or use any sound from Freesounds<div id='next-record' class='next-btn'>NEXT</div>";
@@ -1489,6 +1491,8 @@ function tutorial(){
                         searchRight.classList.remove("show");
                         searchLeftBtn.classList.remove("clicked");
                         searchRightBtn.classList.remove("clicked");
+                        searchLeftBtn.innerHTML = "+";
+                        searchRightBtn.innerHTML = "+";
 
                         instruction.innerHTML =
                             "Record your soundscape, then bounce & download your mix <div id='next-final' class='next-btn'>GOT IT!</div>";
